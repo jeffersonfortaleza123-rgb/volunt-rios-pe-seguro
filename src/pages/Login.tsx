@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Users } from "lucide-react";
+import { Shield, Users, Flame } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import firefighterHelmet from "@/assets/firefighter-helmet.jpg";
+import firefighterEmblem from "@/assets/firefighter-emblem.jpg";
 
 const Login = () => {
   const [loginType, setLoginType] = useState<"escalante" | "militar" | null>(null);
@@ -45,40 +47,56 @@ const Login = () => {
 
   if (!loginType) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="w-full max-w-md space-y-6">
+      <div className="min-h-screen bg-gradient-to-br from-fire-light via-background to-fire-gray flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Background images */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-10">
+          <img 
+            src={firefighterEmblem} 
+            alt="Bombeiro Militar" 
+            className="w-96 h-96 object-contain"
+          />
+        </div>
+        
+        <div className="w-full max-w-md space-y-6 relative z-10">
           <div className="text-center">
-            <div className="flex justify-center mb-4">
-              <Badge variant="outline" className="text-lg px-4 py-2 bg-military-green text-primary-foreground border-military-green">
-                🪖 Voluntariado Militar
-              </Badge>
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <img 
+                  src={firefighterHelmet} 
+                  alt="Capacete de Bombeiro" 
+                  className="w-20 h-20 object-contain filter drop-shadow-lg"
+                />
+              </div>
             </div>
-            <h1 className="text-2xl font-bold text-military-dark mb-2">Sistema de Escalas</h1>
-            <p className="text-muted-foreground">Selecione seu tipo de acesso</p>
+            <Badge variant="outline" className="text-lg px-6 py-3 bg-fire-red text-primary-foreground border-fire-red shadow-fire mb-4">
+              🔥 Bombeiros Militar
+            </Badge>
+            <h1 className="text-3xl font-bold text-fire-black mb-2">Sistema de Escalas</h1>
+            <p className="text-muted-foreground">Corpo de Bombeiros - Voluntariado</p>
           </div>
 
           <div className="space-y-4">
             <Button
               onClick={() => setLoginType("escalante")}
-              className="w-full h-16 bg-military-green hover:bg-military-dark text-primary-foreground"
+              className="w-full h-18 bg-fire-red hover:bg-fire-red-dark text-primary-foreground shadow-fire transition-all duration-300 hover:scale-105"
               size="lg"
             >
-              <Shield className="mr-3 h-6 w-6" />
+              <Shield className="mr-3 h-7 w-7" />
               <div className="text-left">
-                <div className="font-semibold">Escalante</div>
-                <div className="text-sm opacity-90">Visualizar relatórios</div>
+                <div className="font-bold text-lg">Escalante</div>
+                <div className="text-sm opacity-90">Comandante - Visualizar relatórios</div>
               </div>
             </Button>
 
             <Button
               onClick={() => setLoginType("militar")}
-              className="w-full h-16 bg-military-light hover:bg-military-green text-military-dark hover:text-primary-foreground"
+              className="w-full h-18 bg-fire-gray hover:bg-fire-red text-fire-black hover:text-primary-foreground border-2 border-fire-red shadow-lg transition-all duration-300 hover:scale-105"
               variant="outline"
               size="lg"
             >
-              <Users className="mr-3 h-6 w-6" />
+              <Flame className="mr-3 h-7 w-7" />
               <div className="text-left">
-                <div className="font-semibold">Militar</div>
+                <div className="font-bold text-lg">Bombeiro Militar</div>
                 <div className="text-sm opacity-75">Registrar voluntariado</div>
               </div>
             </Button>
@@ -89,18 +107,18 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-fire-light via-background to-fire-gray flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-xl border-fire-red/20">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            {loginType === "escalante" ? (
-              <Shield className="h-12 w-12 text-military-green" />
-            ) : (
-              <Users className="h-12 w-12 text-military-green" />
-            )}
+            <img 
+              src={firefighterHelmet} 
+              alt="Capacete de Bombeiro" 
+              className="w-16 h-16 object-contain"
+            />
           </div>
-          <CardTitle className="text-military-dark">
-            {loginType === "escalante" ? "Login Escalante" : "Login Militar"}
+          <CardTitle className="text-fire-black text-xl">
+            {loginType === "escalante" ? "Login Comandante" : "Login Bombeiro Militar"}
           </CardTitle>
           <CardDescription>
             {loginType === "escalante" 
@@ -113,49 +131,53 @@ const Login = () => {
           {loginType === "escalante" ? (
             <>
               <div className="space-y-2">
-                <Label htmlFor="usuario">Usuário</Label>
+                <Label htmlFor="usuario" className="text-fire-black font-medium">Usuário</Label>
                 <Input
                   id="usuario"
                   value={credentials.usuario}
                   onChange={(e) => setCredentials({...credentials, usuario: e.target.value})}
                   placeholder="Escalante"
+                  className="border-fire-red/30 focus:border-fire-red"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="senha">Senha</Label>
+                <Label htmlFor="senha" className="text-fire-black font-medium">Senha</Label>
                 <Input
                   id="senha"
                   type="password"
                   value={credentials.senha}
                   onChange={(e) => setCredentials({...credentials, senha: e.target.value})}
                   placeholder="Digite sua senha"
+                  className="border-fire-red/30 focus:border-fire-red"
                 />
               </div>
-              <Button onClick={handleEscalanteLogin} className="w-full bg-military-green hover:bg-military-dark">
+              <Button onClick={handleEscalanteLogin} className="w-full bg-fire-red hover:bg-fire-red-dark shadow-fire">
                 Entrar
               </Button>
             </>
           ) : (
             <>
               <div className="space-y-2">
-                <Label htmlFor="nome">Nome Completo</Label>
+                <Label htmlFor="nome" className="text-fire-black font-medium">Nome Completo</Label>
                 <Input
                   id="nome"
                   value={credentials.nome}
                   onChange={(e) => setCredentials({...credentials, nome: e.target.value})}
                   placeholder="Digite seu nome completo"
+                  className="border-fire-red/30 focus:border-fire-red"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="matricula">Matrícula</Label>
+                <Label htmlFor="matricula" className="text-fire-black font-medium">Matrícula</Label>
                 <Input
                   id="matricula"
                   value={credentials.matricula}
                   onChange={(e) => setCredentials({...credentials, matricula: e.target.value})}
                   placeholder="Digite sua matrícula"
+                  className="border-fire-red/30 focus:border-fire-red"
                 />
               </div>
-              <Button onClick={handleMilitarLogin} className="w-full bg-military-green hover:bg-military-dark">
+              <Button onClick={handleMilitarLogin} className="w-full bg-fire-red hover:bg-fire-red-dark shadow-fire">
                 Continuar
               </Button>
             </>
@@ -164,7 +186,7 @@ const Login = () => {
           <Button
             onClick={() => setLoginType(null)}
             variant="outline"
-            className="w-full"
+            className="w-full border-fire-red text-fire-red hover:bg-fire-red hover:text-white"
           >
             Voltar
           </Button>

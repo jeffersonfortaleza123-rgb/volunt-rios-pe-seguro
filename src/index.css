@@ -8,38 +8,45 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 222 15% 95%;
-    --foreground: 130 25% 15%;
+    --background: 0 0% 97%;
+    --foreground: 0 0% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 130 25% 15%;
+    --card-foreground: 0 0% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 130 25% 15%;
+    --popover-foreground: 0 0% 15%;
 
-    --primary: 130 60% 25%;
+    --primary: 0 85% 35%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 130 15% 85%;
-    --secondary-foreground: 130 25% 15%;
+    --secondary: 0 15% 90%;
+    --secondary-foreground: 0 0% 15%;
 
-    --muted: 130 10% 90%;
-    --muted-foreground: 130 15% 45%;
+    --muted: 0 10% 92%;
+    --muted-foreground: 0 5% 50%;
 
-    --accent: 45 85% 55%;
-    --accent-foreground: 130 25% 15%;
+    --accent: 45 95% 50%;
+    --accent-foreground: 0 0% 15%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 130 20% 82%;
-    --input: 130 20% 82%;
-    --ring: 130 60% 25%;
+    --border: 0 15% 88%;
+    --input: 0 15% 88%;
+    --ring: 0 85% 35%;
 
-    --military-green: 130 60% 25%;
-    --military-light: 130 15% 85%;
-    --military-dark: 130 80% 15%;
-    --gold-accent: 45 85% 55%;
+    --fire-red: 0 85% 35%;
+    --fire-red-dark: 0 95% 25%;
+    --fire-gold: 45 95% 50%;
+    --fire-black: 0 0% 15%;
+    --fire-gray: 0 5% 85%;
+    --fire-light: 0 15% 95%;
+
+    --gradient-fire: linear-gradient(135deg, hsl(var(--fire-red)), hsl(var(--fire-red-dark)));
+    --gradient-gold: linear-gradient(135deg, hsl(var(--fire-gold)), hsl(45 85% 40%));
+    --shadow-fire: 0 10px 30px -10px hsl(var(--fire-red) / 0.3);
+    --shadow-gold: 0 8px 25px -8px hsl(var(--fire-gold) / 0.4);
 
     --radius: 0.5rem;
 

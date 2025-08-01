@@ -62,10 +62,12 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				'military-green': 'hsl(var(--military-green))',
-				'military-light': 'hsl(var(--military-light))',
-				'military-dark': 'hsl(var(--military-dark))',
-				'gold-accent': 'hsl(var(--gold-accent))'
+				'fire-red': 'hsl(var(--fire-red))',
+				'fire-red-dark': 'hsl(var(--fire-red-dark))',
+				'fire-gold': 'hsl(var(--fire-gold))',
+				'fire-black': 'hsl(var(--fire-black))',
+				'fire-gray': 'hsl(var(--fire-gray))',
+				'fire-light': 'hsl(var(--fire-light))'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

@@ -14,9 +14,9 @@ const NotFound = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4 text-military-dark">404</h1>
+        <h1 className="text-4xl font-bold mb-4 text-fire-black">404</h1>
         <p className="text-xl text-muted-foreground mb-4">Página não encontrada</p>
-        <a href="/" className="text-military-green hover:text-military-dark underline">
+        <a href="/" className="text-fire-red hover:text-fire-red-dark underline font-medium">
           Voltar ao Login
         </a>
       </div>
