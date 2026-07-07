@@ -255,7 +255,8 @@ const Relatorios = () => {
                       <table className="w-full text-sm border border-fire-red/30">
                         <thead>
                           <tr className="bg-fire-red text-white">
-                            <th className="text-left px-2 py-1 border border-fire-red/30 w-1/3">Matrícula</th>
+                            <th className="text-left px-2 py-1 border border-fire-red/30 w-[25%]">Matrícula</th>
+                            <th className="text-left px-2 py-1 border border-fire-red/30 w-[35%]">Posto/Graduação</th>
                             <th className="text-left px-2 py-1 border border-fire-red/30">Nome de Guerra</th>
                           </tr>
                         </thead>
@@ -263,6 +264,7 @@ const Relatorios = () => {
                           {dadosPorDia[dia].map((v, i) => (
                             <tr key={i} className="odd:bg-fire-light/40">
                               <td className="px-2 py-1 border border-fire-red/30">{v.matricula}</td>
+                              <td className="px-2 py-1 border border-fire-red/30">{v.posto_graduacao}</td>
                               <td className="px-2 py-1 border border-fire-red/30">{v.nome_guerra}</td>
                             </tr>
                           ))}
