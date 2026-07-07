@@ -144,19 +144,51 @@ const Militar = () => {
           </Button>
         </div>
 
-        {/* Instructions */}
+        {/* Seção */}
         <Card className="shadow-lg border-fire-red/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-fire-black">
               <Flame className="h-5 w-5 text-fire-red" />
-              Selecione os dias de voluntariado
+              Onde deseja tirar o serviço extraordinário?
             </CardTitle>
             <CardDescription>
-              Clique nos dias do calendário em que você gostaria de ser voluntário. 
+              Selecione a seção. Depois escolha os dias no calendário.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-2">
+              {SECOES.map((s) => (
+                <Button
+                  key={s}
+                  type="button"
+                  onClick={() => setSecao(s)}
+                  variant={secao === s ? "default" : "outline"}
+                  className={secao === s
+                    ? "bg-fire-red hover:bg-fire-red-dark text-white"
+                    : "border-fire-red text-fire-red hover:bg-fire-red hover:text-white"}
+                >
+                  {s}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Instructions */}
+        {secao && (
+        <Card className="shadow-lg border-fire-red/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-fire-black">
+              <Flame className="h-5 w-5 text-fire-red" />
+              Selecione os dias de voluntariado — {secao}
+            </CardTitle>
+            <CardDescription>
+              Clique nos dias do calendário em que você gostaria de ser voluntário.
               Você pode selecionar múltiplos dias.
             </CardDescription>
           </CardHeader>
         </Card>
+        )}
 
         {/* Calendar */}
         <Card className="shadow-lg border-fire-red/20">
