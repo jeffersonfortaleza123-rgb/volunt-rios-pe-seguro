@@ -7,8 +7,11 @@ import { CheckCircle, Calendar as CalendarIcon, LogOut, Flame } from "lucide-rea
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
+const SECOES = ["Primeira Seção", "Segunda Seção", "Terceira Seção", "Quarta Seção"];
+
 const Militar = () => {
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [secao, setSecao] = useState<string>("");
   const [militarInfo, setMilitarInfo] = useState<any>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
@@ -44,6 +47,14 @@ const Militar = () => {
   };
 
   const handleSubmit = async () => {
+    if (!secao) {
+      toast({
+        title: "Seção não selecionada",
+        description: "Escolha onde deseja tirar o serviço extraordinário",
+        variant: "destructive",
+      });
+      return;
+    }
     if (selectedDates.length === 0) {
       toast({
         title: "Nenhum dia selecionado",
@@ -53,17 +64,17 @@ const Militar = () => {
       return;
     }
 
-    // Simulate API call - In real app, this would save to Supabase
     try {
       const voluntarioData = {
         nome: militarInfo.nome,
+        nome_guerra: militarInfo.nomeGuerra || "",
         matricula: militarInfo.matricula,
+        secao,
         datasSelecionadas: selectedDates.map(date => date.toISOString().split('T')[0]),
         jaPreencheu: true,
         created_at: new Date().toISOString()
       };
 
-      // Simulate saving to localStorage for demo
       const existingData = JSON.parse(localStorage.getItem("voluntarios") || "[]");
       existingData.push(voluntarioData);
       localStorage.setItem("voluntarios", JSON.stringify(existingData));
