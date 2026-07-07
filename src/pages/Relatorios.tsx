@@ -9,11 +9,14 @@ import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
+import { postoRank } from "@/lib/postos";
 
 interface Voluntario {
   nome: string;
   nome_guerra?: string;
+  posto_graduacao?: string;
   matricula: string;
+  email?: string;
   secao?: string;
   datasSelecionadas: string[];
   jaPreencheu: boolean;
@@ -43,10 +46,11 @@ const Relatorios = () => {
     return Array.from(set).sort((a, b) => b - a);
   }, [voluntarios]);
 
-  // { "01": [{ matricula, nome_guerra }, ...], ... }
+  // { "01": [{ matricula, posto_graduacao, nome_guerra }, ...], ... }
+  type Linha = { matricula: string; posto_graduacao: string; nome_guerra: string };
   const dadosPorDia = useMemo(() => {
-    if (!secao) return {} as Record<string, { matricula: string; nome_guerra: string }[]>;
-    const map: Record<string, { matricula: string; nome_guerra: string }[]> = {};
+    if (!secao) return {} as Record<string, Linha[]>;
+    const map: Record<string, Linha[]> = {};
     voluntarios
       .filter(v => (v.secao || "") === secao)
       .forEach(v => {
@@ -57,13 +61,18 @@ const Relatorios = () => {
           if (!map[dia]) map[dia] = [];
           map[dia].push({
             matricula: v.matricula,
+            posto_graduacao: v.posto_graduacao || "",
             nome_guerra: v.nome_guerra || v.nome,
           });
         });
       });
-    // ordenar por nome de guerra
+    // ordenar por hierarquia (mais alto → mais baixo) e depois nome de guerra
     Object.keys(map).forEach(k => {
-      map[k].sort((a, b) => a.nome_guerra.localeCompare(b.nome_guerra, "pt-BR"));
+      map[k].sort((a, b) => {
+        const r = postoRank(a.posto_graduacao) - postoRank(b.posto_graduacao);
+        if (r !== 0) return r;
+        return a.nome_guerra.localeCompare(b.nome_guerra, "pt-BR");
+      });
     });
     return map;
   }, [voluntarios, mes, ano, secao]);
@@ -101,8 +110,8 @@ const Relatorios = () => {
       cursorY += 2;
       autoTable(doc, {
         startY: cursorY + 2,
-        head: [["Matrícula", "Nome de Guerra"]],
-        body: dadosPorDia[dia].map(v => [v.matricula, v.nome_guerra]),
+        head: [["Matrícula", "Posto/Graduação", "Nome de Guerra"]],
+        body: dadosPorDia[dia].map(v => [v.matricula, v.posto_graduacao, v.nome_guerra]),
         theme: "grid",
         headStyles: { fillColor: [163, 22, 33] },
         styles: { fontSize: 9 },
@@ -132,8 +141,8 @@ const Relatorios = () => {
     ];
     diasOrdenados.forEach(dia => {
       rows.push([`Dia ${dia}`]);
-      rows.push(["Matrícula", "Nome de Guerra"]);
-      dadosPorDia[dia].forEach(v => rows.push([v.matricula, v.nome_guerra]));
+      rows.push(["Matrícula", "Posto/Graduação", "Nome de Guerra"]);
+      dadosPorDia[dia].forEach(v => rows.push([v.matricula, v.posto_graduacao, v.nome_guerra]));
       rows.push([]);
     });
     const ws = XLSX.utils.aoa_to_sheet(rows);
@@ -246,7 +255,8 @@ const Relatorios = () => {
                       <table className="w-full text-sm border border-fire-red/30">
                         <thead>
                           <tr className="bg-fire-red text-white">
-                            <th className="text-left px-2 py-1 border border-fire-red/30 w-1/3">Matrícula</th>
+                            <th className="text-left px-2 py-1 border border-fire-red/30 w-[25%]">Matrícula</th>
+                            <th className="text-left px-2 py-1 border border-fire-red/30 w-[35%]">Posto/Graduação</th>
                             <th className="text-left px-2 py-1 border border-fire-red/30">Nome de Guerra</th>
                           </tr>
                         </thead>
@@ -254,6 +264,7 @@ const Relatorios = () => {
                           {dadosPorDia[dia].map((v, i) => (
                             <tr key={i} className="odd:bg-fire-light/40">
                               <td className="px-2 py-1 border border-fire-red/30">{v.matricula}</td>
+                              <td className="px-2 py-1 border border-fire-red/30">{v.posto_graduacao}</td>
                               <td className="px-2 py-1 border border-fire-red/30">{v.nome_guerra}</td>
                             </tr>
                           ))}

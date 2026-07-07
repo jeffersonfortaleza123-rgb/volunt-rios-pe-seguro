@@ -8,7 +8,9 @@ import { useNavigate, Link } from "react-router-dom";
 interface Voluntario {
   nome: string;
   nome_guerra?: string;
+  posto_graduacao?: string;
   matricula: string;
+  email?: string;
   secao?: string;
   datasSelecionadas: string[];
   jaPreencheu: boolean;
@@ -189,10 +191,16 @@ const Escalante = () => {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <h4 className="font-semibold text-fire-black">{voluntario.nome}</h4>
+                        {voluntario.posto_graduacao && (
+                          <p className="text-sm text-fire-red font-semibold">Posto/Graduação: {voluntario.posto_graduacao}</p>
+                        )}
                         {voluntario.nome_guerra && (
                           <p className="text-sm text-fire-red font-medium">Nome de Guerra: {voluntario.nome_guerra}</p>
                         )}
                         <p className="text-sm text-muted-foreground">Matrícula: {voluntario.matricula}</p>
+                        {voluntario.email && (
+                          <p className="text-sm text-muted-foreground">E-mail: {voluntario.email}</p>
+                        )}
                         {voluntario.secao && (
                           <p className="text-sm text-muted-foreground">Seção: {voluntario.secao}</p>
                         )}

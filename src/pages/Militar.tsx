@@ -68,7 +68,9 @@ const Militar = () => {
       const voluntarioData = {
         nome: militarInfo.nome,
         nome_guerra: militarInfo.nomeGuerra || "",
+        posto_graduacao: militarInfo.posto || "",
         matricula: militarInfo.matricula,
+        email: militarInfo.email || "",
         secao,
         datasSelecionadas: selectedDates.map(date => date.toISOString().split('T')[0]),
         jaPreencheu: true,

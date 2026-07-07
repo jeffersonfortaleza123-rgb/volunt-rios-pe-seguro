@@ -7,12 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Shield, Users, Flame } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { OFICIAIS, PRACAS } from "@/lib/postos";
 import firefighterHelmet from "@/assets/firefighter-helmet.jpg";
 import firefighterEmblem from "@/assets/firefighter-emblem.jpg";
 
 const Login = () => {
   const [loginType, setLoginType] = useState<"escalante" | "militar" | null>(null);
-  const [credentials, setCredentials] = useState({ usuario: "", senha: "", nome: "", nomeGuerra: "", matricula: "" });
+  const [credentials, setCredentials] = useState({ usuario: "", senha: "", nome: "", nomeGuerra: "", posto: "", matricula: "", email: "" });
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -29,17 +31,26 @@ const Login = () => {
   };
 
   const handleMilitarLogin = () => {
-    if (credentials.nome.trim() && credentials.nomeGuerra.trim() && credentials.matricula.trim()) {
+    const emailOk = /^\S+@\S+\.\S+$/.test(credentials.email.trim());
+    if (
+      credentials.nome.trim() &&
+      credentials.nomeGuerra.trim() &&
+      credentials.posto.trim() &&
+      credentials.matricula.trim() &&
+      emailOk
+    ) {
       localStorage.setItem("militarInfo", JSON.stringify({
         nome: credentials.nome,
         nomeGuerra: credentials.nomeGuerra,
-        matricula: credentials.matricula
+        posto: credentials.posto,
+        matricula: credentials.matricula,
+        email: credentials.email,
       }));
       navigate("/militar");
     } else {
       toast({
         title: "Dados Incompletos",
-        description: "Por favor, preencha nome completo, nome de guerra e matrícula",
+        description: "Preencha nome completo, nome de guerra, posto/graduação, matrícula e um e-mail válido.",
         variant: "destructive",
       });
     }
@@ -178,12 +189,41 @@ const Login = () => {
                 />
               </div>
               <div className="space-y-2">
+                <Label className="text-fire-black font-medium">Posto/Graduação</Label>
+                <Select value={credentials.posto} onValueChange={(v) => setCredentials({...credentials, posto: v})}>
+                  <SelectTrigger className="border-fire-red/30 focus:border-fire-red">
+                    <SelectValue placeholder="Selecione o posto/graduação" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Oficiais</SelectLabel>
+                      {OFICIAIS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Praças</SelectLabel>
+                      {PRACAS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="matricula" className="text-fire-black font-medium">Matrícula</Label>
                 <Input
                   id="matricula"
                   value={credentials.matricula}
                   onChange={(e) => setCredentials({...credentials, matricula: e.target.value})}
                   placeholder="Digite sua matrícula"
+                  className="border-fire-red/30 focus:border-fire-red"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-fire-black font-medium">E-mail</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={credentials.email}
+                  onChange={(e) => setCredentials({...credentials, email: e.target.value})}
+                  placeholder="seuemail@exemplo.com"
                   className="border-fire-red/30 focus:border-fire-red"
                 />
               </div>
