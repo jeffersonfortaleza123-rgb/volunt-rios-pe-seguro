@@ -46,10 +46,11 @@ const Relatorios = () => {
     return Array.from(set).sort((a, b) => b - a);
   }, [voluntarios]);
 
-  // { "01": [{ matricula, nome_guerra }, ...], ... }
+  // { "01": [{ matricula, posto_graduacao, nome_guerra }, ...], ... }
+  type Linha = { matricula: string; posto_graduacao: string; nome_guerra: string };
   const dadosPorDia = useMemo(() => {
-    if (!secao) return {} as Record<string, { matricula: string; nome_guerra: string }[]>;
-    const map: Record<string, { matricula: string; nome_guerra: string }[]> = {};
+    if (!secao) return {} as Record<string, Linha[]>;
+    const map: Record<string, Linha[]> = {};
     voluntarios
       .filter(v => (v.secao || "") === secao)
       .forEach(v => {
@@ -60,13 +61,18 @@ const Relatorios = () => {
           if (!map[dia]) map[dia] = [];
           map[dia].push({
             matricula: v.matricula,
+            posto_graduacao: v.posto_graduacao || "",
             nome_guerra: v.nome_guerra || v.nome,
           });
         });
       });
-    // ordenar por nome de guerra
+    // ordenar por hierarquia (mais alto → mais baixo) e depois nome de guerra
     Object.keys(map).forEach(k => {
-      map[k].sort((a, b) => a.nome_guerra.localeCompare(b.nome_guerra, "pt-BR"));
+      map[k].sort((a, b) => {
+        const r = postoRank(a.posto_graduacao) - postoRank(b.posto_graduacao);
+        if (r !== 0) return r;
+        return a.nome_guerra.localeCompare(b.nome_guerra, "pt-BR");
+      });
     });
     return map;
   }, [voluntarios, mes, ano, secao]);
@@ -104,8 +110,8 @@ const Relatorios = () => {
       cursorY += 2;
       autoTable(doc, {
         startY: cursorY + 2,
-        head: [["Matrícula", "Nome de Guerra"]],
-        body: dadosPorDia[dia].map(v => [v.matricula, v.nome_guerra]),
+        head: [["Matrícula", "Posto/Graduação", "Nome de Guerra"]],
+        body: dadosPorDia[dia].map(v => [v.matricula, v.posto_graduacao, v.nome_guerra]),
         theme: "grid",
         headStyles: { fillColor: [163, 22, 33] },
         styles: { fontSize: 9 },
@@ -135,8 +141,8 @@ const Relatorios = () => {
     ];
     diasOrdenados.forEach(dia => {
       rows.push([`Dia ${dia}`]);
-      rows.push(["Matrícula", "Nome de Guerra"]);
-      dadosPorDia[dia].forEach(v => rows.push([v.matricula, v.nome_guerra]));
+      rows.push(["Matrícula", "Posto/Graduação", "Nome de Guerra"]);
+      dadosPorDia[dia].forEach(v => rows.push([v.matricula, v.posto_graduacao, v.nome_guerra]));
       rows.push([]);
     });
     const ws = XLSX.utils.aoa_to_sheet(rows);
