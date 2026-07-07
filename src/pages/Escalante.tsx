@@ -75,9 +75,14 @@ const Escalante = () => {
             <h1 className="text-2xl font-bold text-fire-black">Relatório de Voluntários</h1>
             <p className="text-muted-foreground">{getCurrentMonthName()} de {new Date().getFullYear()}</p>
           </div>
-          <Button onClick={handleLogout} variant="outline" size="sm" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
-            <LogOut className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild size="sm" className="bg-fire-red hover:bg-fire-red-dark">
+              <Link to="/relatorios"><FileText className="h-4 w-4 mr-2" />Relatórios</Link>
+            </Button>
+            <Button onClick={handleLogout} variant="outline" size="sm" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         {/* Statistics */}
