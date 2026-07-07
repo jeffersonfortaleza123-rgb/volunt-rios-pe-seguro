@@ -189,12 +189,41 @@ const Login = () => {
                 />
               </div>
               <div className="space-y-2">
+                <Label className="text-fire-black font-medium">Posto/Graduação</Label>
+                <Select value={credentials.posto} onValueChange={(v) => setCredentials({...credentials, posto: v})}>
+                  <SelectTrigger className="border-fire-red/30 focus:border-fire-red">
+                    <SelectValue placeholder="Selecione o posto/graduação" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Oficiais</SelectLabel>
+                      {OFICIAIS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Praças</SelectLabel>
+                      {PRACAS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="matricula" className="text-fire-black font-medium">Matrícula</Label>
                 <Input
                   id="matricula"
                   value={credentials.matricula}
                   onChange={(e) => setCredentials({...credentials, matricula: e.target.value})}
                   placeholder="Digite sua matrícula"
+                  className="border-fire-red/30 focus:border-fire-red"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-fire-black font-medium">E-mail</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={credentials.email}
+                  onChange={(e) => setCredentials({...credentials, email: e.target.value})}
+                  placeholder="seuemail@exemplo.com"
                   className="border-fire-red/30 focus:border-fire-red"
                 />
               </div>
