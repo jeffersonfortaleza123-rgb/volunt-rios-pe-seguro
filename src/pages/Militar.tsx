@@ -191,6 +191,7 @@ const Militar = () => {
         )}
 
         {/* Calendar */}
+        {secao && (
         <Card className="shadow-lg border-fire-red/20">
           <CardContent className="p-6">
             <div className="flex justify-center">
@@ -208,6 +209,7 @@ const Militar = () => {
             </div>
           </CardContent>
         </Card>
+        )}
 
         {/* Selected dates display */}
         {selectedDates.length > 0 && (
