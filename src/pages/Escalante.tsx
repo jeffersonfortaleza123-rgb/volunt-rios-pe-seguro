@@ -8,7 +8,9 @@ import { useNavigate, Link } from "react-router-dom";
 interface Voluntario {
   nome: string;
   nome_guerra?: string;
+  posto_graduacao?: string;
   matricula: string;
+  email?: string;
   secao?: string;
   datasSelecionadas: string[];
   jaPreencheu: boolean;
