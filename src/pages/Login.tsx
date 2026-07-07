@@ -7,12 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Shield, Users, Flame } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { OFICIAIS, PRACAS } from "@/lib/postos";
 import firefighterHelmet from "@/assets/firefighter-helmet.jpg";
 import firefighterEmblem from "@/assets/firefighter-emblem.jpg";
 
 const Login = () => {
   const [loginType, setLoginType] = useState<"escalante" | "militar" | null>(null);
-  const [credentials, setCredentials] = useState({ usuario: "", senha: "", nome: "", nomeGuerra: "", matricula: "" });
+  const [credentials, setCredentials] = useState({ usuario: "", senha: "", nome: "", nomeGuerra: "", posto: "", matricula: "", email: "" });
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -29,17 +31,26 @@ const Login = () => {
   };
 
   const handleMilitarLogin = () => {
-    if (credentials.nome.trim() && credentials.nomeGuerra.trim() && credentials.matricula.trim()) {
+    const emailOk = /^\S+@\S+\.\S+$/.test(credentials.email.trim());
+    if (
+      credentials.nome.trim() &&
+      credentials.nomeGuerra.trim() &&
+      credentials.posto.trim() &&
+      credentials.matricula.trim() &&
+      emailOk
+    ) {
       localStorage.setItem("militarInfo", JSON.stringify({
         nome: credentials.nome,
         nomeGuerra: credentials.nomeGuerra,
-        matricula: credentials.matricula
+        posto: credentials.posto,
+        matricula: credentials.matricula,
+        email: credentials.email,
       }));
       navigate("/militar");
     } else {
       toast({
         title: "Dados Incompletos",
-        description: "Por favor, preencha nome completo, nome de guerra e matrícula",
+        description: "Preencha nome completo, nome de guerra, posto/graduação, matrícula e um e-mail válido.",
         variant: "destructive",
       });
     }
