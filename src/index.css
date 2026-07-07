@@ -115,3 +115,10 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@media print {
+  @page { size: A4; margin: 15mm; }
+  body { background: white !important; }
+  .print\:hidden { display: none !important; }
+  #print-area { box-shadow: none !important; border: 0 !important; padding: 0 !important; }
+}

@@ -7,8 +7,11 @@ import { CheckCircle, Calendar as CalendarIcon, LogOut, Flame } from "lucide-rea
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
+const SECOES = ["Primeira Seção", "Segunda Seção", "Terceira Seção", "Quarta Seção"];
+
 const Militar = () => {
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [secao, setSecao] = useState<string>("");
   const [militarInfo, setMilitarInfo] = useState<any>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
@@ -44,6 +47,14 @@ const Militar = () => {
   };
 
   const handleSubmit = async () => {
+    if (!secao) {
+      toast({
+        title: "Seção não selecionada",
+        description: "Escolha onde deseja tirar o serviço extraordinário",
+        variant: "destructive",
+      });
+      return;
+    }
     if (selectedDates.length === 0) {
       toast({
         title: "Nenhum dia selecionado",
@@ -53,17 +64,17 @@ const Militar = () => {
       return;
     }
 
-    // Simulate API call - In real app, this would save to Supabase
     try {
       const voluntarioData = {
         nome: militarInfo.nome,
+        nome_guerra: militarInfo.nomeGuerra || "",
         matricula: militarInfo.matricula,
+        secao,
         datasSelecionadas: selectedDates.map(date => date.toISOString().split('T')[0]),
         jaPreencheu: true,
         created_at: new Date().toISOString()
       };
 
-      // Simulate saving to localStorage for demo
       const existingData = JSON.parse(localStorage.getItem("voluntarios") || "[]");
       existingData.push(voluntarioData);
       localStorage.setItem("voluntarios", JSON.stringify(existingData));
@@ -133,21 +144,54 @@ const Militar = () => {
           </Button>
         </div>
 
-        {/* Instructions */}
+        {/* Seção */}
         <Card className="shadow-lg border-fire-red/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-fire-black">
               <Flame className="h-5 w-5 text-fire-red" />
-              Selecione os dias de voluntariado
+              Onde deseja tirar o serviço extraordinário?
             </CardTitle>
             <CardDescription>
-              Clique nos dias do calendário em que você gostaria de ser voluntário. 
+              Selecione a seção. Depois escolha os dias no calendário.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-2">
+              {SECOES.map((s) => (
+                <Button
+                  key={s}
+                  type="button"
+                  onClick={() => setSecao(s)}
+                  variant={secao === s ? "default" : "outline"}
+                  className={secao === s
+                    ? "bg-fire-red hover:bg-fire-red-dark text-white"
+                    : "border-fire-red text-fire-red hover:bg-fire-red hover:text-white"}
+                >
+                  {s}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Instructions */}
+        {secao && (
+        <Card className="shadow-lg border-fire-red/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-fire-black">
+              <Flame className="h-5 w-5 text-fire-red" />
+              Selecione os dias de voluntariado — {secao}
+            </CardTitle>
+            <CardDescription>
+              Clique nos dias do calendário em que você gostaria de ser voluntário.
               Você pode selecionar múltiplos dias.
             </CardDescription>
           </CardHeader>
         </Card>
+        )}
 
         {/* Calendar */}
+        {secao && (
         <Card className="shadow-lg border-fire-red/20">
           <CardContent className="p-6">
             <div className="flex justify-center">
@@ -165,6 +209,7 @@ const Militar = () => {
             </div>
           </CardContent>
         </Card>
+        )}
 
         {/* Selected dates display */}
         {selectedDates.length > 0 && (

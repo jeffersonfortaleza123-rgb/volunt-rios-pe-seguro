@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, Calendar, Users, Flame } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Shield, LogOut, Calendar, Users, Flame, FileText } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 
 interface Voluntario {
   nome: string;
+  nome_guerra?: string;
   matricula: string;
+  secao?: string;
   datasSelecionadas: string[];
   jaPreencheu: boolean;
   created_at: string;
@@ -32,7 +34,8 @@ const Escalante = () => {
         if (!relatorio[day]) {
           relatorio[day] = [];
         }
-        relatorio[day].push(voluntario.nome);
+        const label = voluntario.nome_guerra ? `${voluntario.nome} (${voluntario.nome_guerra})` : voluntario.nome;
+        relatorio[day].push(label);
       });
     });
     
@@ -72,9 +75,14 @@ const Escalante = () => {
             <h1 className="text-2xl font-bold text-fire-black">Relatório de Voluntários</h1>
             <p className="text-muted-foreground">{getCurrentMonthName()} de {new Date().getFullYear()}</p>
           </div>
-          <Button onClick={handleLogout} variant="outline" size="sm" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
-            <LogOut className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild size="sm" className="bg-fire-red hover:bg-fire-red-dark">
+              <Link to="/relatorios"><FileText className="h-4 w-4 mr-2" />Relatórios</Link>
+            </Button>
+            <Button onClick={handleLogout} variant="outline" size="sm" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
         {/* Statistics */}
@@ -181,7 +189,13 @@ const Escalante = () => {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <h4 className="font-semibold text-fire-black">{voluntario.nome}</h4>
+                        {voluntario.nome_guerra && (
+                          <p className="text-sm text-fire-red font-medium">Nome de Guerra: {voluntario.nome_guerra}</p>
+                        )}
                         <p className="text-sm text-muted-foreground">Matrícula: {voluntario.matricula}</p>
+                        {voluntario.secao && (
+                          <p className="text-sm text-muted-foreground">Seção: {voluntario.secao}</p>
+                        )}
                       </div>
                       <Badge variant="secondary" className="bg-fire-gray text-fire-black border border-fire-red/20">
                         {voluntario.datasSelecionadas.length} {voluntario.datasSelecionadas.length === 1 ? 'dia' : 'dias'}
