@@ -12,7 +12,7 @@ import firefighterEmblem from "@/assets/firefighter-emblem.jpg";
 
 const Login = () => {
   const [loginType, setLoginType] = useState<"escalante" | "militar" | null>(null);
-  const [credentials, setCredentials] = useState({ usuario: "", senha: "", nome: "", matricula: "" });
+  const [credentials, setCredentials] = useState({ usuario: "", senha: "", nome: "", nomeGuerra: "", matricula: "" });
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -29,17 +29,17 @@ const Login = () => {
   };
 
   const handleMilitarLogin = () => {
-    if (credentials.nome.trim() && credentials.matricula.trim()) {
-      // Simulate storing login info for the military user
+    if (credentials.nome.trim() && credentials.nomeGuerra.trim() && credentials.matricula.trim()) {
       localStorage.setItem("militarInfo", JSON.stringify({
         nome: credentials.nome,
+        nomeGuerra: credentials.nomeGuerra,
         matricula: credentials.matricula
       }));
       navigate("/militar");
     } else {
       toast({
         title: "Dados Incompletos",
-        description: "Por favor, preencha nome completo e matrícula",
+        description: "Por favor, preencha nome completo, nome de guerra e matrícula",
         variant: "destructive",
       });
     }
@@ -164,6 +164,16 @@ const Login = () => {
                   value={credentials.nome}
                   onChange={(e) => setCredentials({...credentials, nome: e.target.value})}
                   placeholder="Digite seu nome completo"
+                  className="border-fire-red/30 focus:border-fire-red"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nomeGuerra" className="text-fire-black font-medium">Nome de Guerra</Label>
+                <Input
+                  id="nomeGuerra"
+                  value={credentials.nomeGuerra}
+                  onChange={(e) => setCredentials({...credentials, nomeGuerra: e.target.value})}
+                  placeholder="Ex.: SILVA"
                   className="border-fire-red/30 focus:border-fire-red"
                 />
               </div>
