@@ -34,7 +34,8 @@ const Escalante = () => {
         if (!relatorio[day]) {
           relatorio[day] = [];
         }
-        relatorio[day].push(voluntario.nome);
+        const label = voluntario.nome_guerra ? `${voluntario.nome} (${voluntario.nome_guerra})` : voluntario.nome;
+        relatorio[day].push(label);
       });
     });
     
