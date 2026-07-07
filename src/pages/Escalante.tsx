@@ -189,7 +189,13 @@ const Escalante = () => {
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <h4 className="font-semibold text-fire-black">{voluntario.nome}</h4>
+                        {voluntario.nome_guerra && (
+                          <p className="text-sm text-fire-red font-medium">Nome de Guerra: {voluntario.nome_guerra}</p>
+                        )}
                         <p className="text-sm text-muted-foreground">Matrícula: {voluntario.matricula}</p>
+                        {voluntario.secao && (
+                          <p className="text-sm text-muted-foreground">Seção: {voluntario.secao}</p>
+                        )}
                       </div>
                       <Badge variant="secondary" className="bg-fire-gray text-fire-black border border-fire-red/20">
                         {voluntario.datasSelecionadas.length} {voluntario.datasSelecionadas.length === 1 ? 'dia' : 'dias'}
