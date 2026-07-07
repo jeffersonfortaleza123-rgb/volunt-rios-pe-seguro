@@ -9,11 +9,14 @@ import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
+import { postoRank } from "@/lib/postos";
 
 interface Voluntario {
   nome: string;
   nome_guerra?: string;
+  posto_graduacao?: string;
   matricula: string;
+  email?: string;
   secao?: string;
   datasSelecionadas: string[];
   jaPreencheu: boolean;
