@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, Calendar, Users, Flame } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Shield, LogOut, Calendar, Users, Flame, FileText } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 
 interface Voluntario {
   nome: string;
+  nome_guerra?: string;
   matricula: string;
+  secao?: string;
   datasSelecionadas: string[];
   jaPreencheu: boolean;
   created_at: string;
