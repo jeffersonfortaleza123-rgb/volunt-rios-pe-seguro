@@ -121,4 +121,7 @@ All colors MUST be HSL.
   body { background: white !important; }
   .print\:hidden { display: none !important; }
   #print-area { box-shadow: none !important; border: 0 !important; padding: 0 !important; }
+  .day-block { break-inside: avoid; page-break-inside: avoid; }
+  .day-break { break-before: page; page-break-before: always; }
 }
+
