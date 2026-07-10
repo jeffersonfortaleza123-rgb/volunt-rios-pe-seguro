@@ -186,10 +186,10 @@ const Relatorios = () => {
             <CardTitle className="text-fire-black">Competência</CardTitle>
             <CardDescription>Escolha o mês e ano para gerar o relatório</CardDescription>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>Mês</Label>
-              <Select value={String(mes)} onValueChange={v => setMes(Number(v))}>
+              <Select value={String(mes)} onValueChange={v => { setMes(Number(v)); setDiaFiltro("todos"); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {MESES.map((m, i) => <SelectItem key={m} value={String(i)}>{m}</SelectItem>)}
@@ -198,14 +198,25 @@ const Relatorios = () => {
             </div>
             <div className="space-y-2">
               <Label>Ano</Label>
-              <Select value={String(ano)} onValueChange={v => setAno(Number(v))}>
+              <Select value={String(ano)} onValueChange={v => { setAno(Number(v)); setDiaFiltro("todos"); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {anos.map(a => <SelectItem key={a} value={String(a)}>{a}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label>Dia</Label>
+              <Select value={diaFiltro} onValueChange={setDiaFiltro} disabled={!secao || diasDisponiveis.length === 0}>
+                <SelectTrigger><SelectValue placeholder="Todos os dias" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os dias</SelectItem>
+                  {diasDisponiveis.map(d => <SelectItem key={d} value={d}>Dia {d}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
           </CardContent>
+
         </Card>
 
         {/* Seções */}
