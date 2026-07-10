@@ -99,12 +99,8 @@ const Relatorios = () => {
     const subtitulo = `Escala de Voluntariado - ${secao}`;
     const competencia = `${MESES[mes]} / ${ano}`;
 
-    doc.setFontSize(14);
-    doc.text(titulo, 105, 15, { align: "center" });
-    doc.setFontSize(12);
-    doc.text(subtitulo, 105, 22, { align: "center" });
-    doc.setFontSize(10);
-    doc.text(`Competência: ${competencia}`, 105, 28, { align: "center" });
+
+
 
     diasOrdenados.forEach((dia, idx) => {
       if (idx > 0) {
