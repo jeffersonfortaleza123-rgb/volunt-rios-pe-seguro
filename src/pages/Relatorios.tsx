@@ -34,11 +34,13 @@ const Relatorios = () => {
   const [mes, setMes] = useState<number>(now.getMonth());
   const [ano, setAno] = useState<number>(now.getFullYear());
   const [secao, setSecao] = useState<string>("");
+  const [diaFiltro, setDiaFiltro] = useState<string>("todos");
 
   const voluntarios: Voluntario[] = useMemo(
     () => JSON.parse(localStorage.getItem("voluntarios") || "[]"),
     []
   );
+
 
   const anos = useMemo(() => {
     const set = new Set<number>([now.getFullYear()]);
@@ -77,10 +79,16 @@ const Relatorios = () => {
     return map;
   }, [voluntarios, mes, ano, secao]);
 
-  const diasOrdenados = useMemo(
+  const diasOrdenados = useMemo(() => {
+    const todos = Object.keys(dadosPorDia).sort((a, b) => Number(a) - Number(b));
+    return diaFiltro === "todos" ? todos : todos.filter(d => d === diaFiltro);
+  }, [dadosPorDia, diaFiltro]);
+
+  const diasDisponiveis = useMemo(
     () => Object.keys(dadosPorDia).sort((a, b) => Number(a) - Number(b)),
     [dadosPorDia]
   );
+
 
   const handlePrint = () => window.print();
 
@@ -91,25 +99,30 @@ const Relatorios = () => {
     const subtitulo = `Escala de Voluntariado - ${secao}`;
     const competencia = `${MESES[mes]} / ${ano}`;
 
-    doc.setFontSize(14);
-    doc.text(titulo, 105, 15, { align: "center" });
-    doc.setFontSize(12);
-    doc.text(subtitulo, 105, 22, { align: "center" });
-    doc.setFontSize(10);
-    doc.text(`Competência: ${competencia}`, 105, 28, { align: "center" });
 
-    let cursorY = 36;
-    diasOrdenados.forEach(dia => {
-      if (cursorY > 260) {
+
+
+    diasOrdenados.forEach((dia, idx) => {
+      if (idx > 0) {
+        // uma página por dia
         doc.addPage();
-        cursorY = 20;
       }
-      doc.setFontSize(11);
+      // cabeçalho da página do dia
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text(titulo, 105, 15, { align: "center" });
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      doc.text(subtitulo, 105, 22, { align: "center" });
+      doc.setFontSize(10);
+      doc.text(`Competência: ${competencia}`, 105, 28, { align: "center" });
+
+      let cursorY = 40;
+      doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
       doc.text(`Dia ${dia}`, 14, cursorY);
-      cursorY += 2;
       autoTable(doc, {
-        startY: cursorY + 2,
+        startY: cursorY + 3,
         head: [["Matrícula", "Posto/Graduação", "Nome de Guerra"]],
         body: dadosPorDia[dia].map(v => [v.matricula, v.posto_graduacao, v.nome_guerra]),
         theme: "grid",
@@ -117,9 +130,8 @@ const Relatorios = () => {
         styles: { fontSize: 9 },
         margin: { left: 14, right: 14 },
       });
-      // @ts-ignore
-      cursorY = (doc as any).lastAutoTable.finalY + 6;
     });
+
 
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
@@ -133,23 +145,28 @@ const Relatorios = () => {
   };
 
   const handleExportExcel = () => {
-    const rows: (string | number)[][] = [
-      ["Corpo de Bombeiros Militar"],
-      [`Escala de Voluntariado - ${secao}`],
-      [`Competência: ${MESES[mes]} / ${ano}`],
-      [],
-    ];
-    diasOrdenados.forEach(dia => {
-      rows.push([`Dia ${dia}`]);
-      rows.push(["Matrícula", "Posto/Graduação", "Nome de Guerra"]);
-      dadosPorDia[dia].forEach(v => rows.push([v.matricula, v.posto_graduacao, v.nome_guerra]));
-      rows.push([]);
-    });
-    const ws = XLSX.utils.aoa_to_sheet(rows);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, secao || "Relatório");
-    XLSX.writeFile(wb, `relatorio-${secao}-${MESES[mes]}-${ano}.xlsx`);
+    diasOrdenados.forEach(dia => {
+      const rows: (string | number)[][] = [
+        ["Corpo de Bombeiros Militar"],
+        [`Escala de Voluntariado - ${secao}`],
+        [`Competência: ${MESES[mes]} / ${ano}`],
+        [`Dia ${dia}`],
+        [],
+        ["Matrícula", "Posto/Graduação", "Nome de Guerra"],
+      ];
+      dadosPorDia[dia].forEach(v => rows.push([v.matricula, v.posto_graduacao, v.nome_guerra]));
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, `Dia ${dia}`);
+    });
+    if (diasOrdenados.length === 0) {
+      const ws = XLSX.utils.aoa_to_sheet([["Sem registros"]]);
+      XLSX.utils.book_append_sheet(wb, ws, "Vazio");
+    }
+    const sufixo = diaFiltro === "todos" ? "" : `-dia-${diaFiltro}`;
+    XLSX.writeFile(wb, `relatorio-${secao}-${MESES[mes]}-${ano}${sufixo}.xlsx`);
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-fire-light via-background to-fire-gray p-4">
@@ -174,10 +191,10 @@ const Relatorios = () => {
             <CardTitle className="text-fire-black">Competência</CardTitle>
             <CardDescription>Escolha o mês e ano para gerar o relatório</CardDescription>
           </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>Mês</Label>
-              <Select value={String(mes)} onValueChange={v => setMes(Number(v))}>
+              <Select value={String(mes)} onValueChange={v => { setMes(Number(v)); setDiaFiltro("todos"); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {MESES.map((m, i) => <SelectItem key={m} value={String(i)}>{m}</SelectItem>)}
@@ -186,14 +203,25 @@ const Relatorios = () => {
             </div>
             <div className="space-y-2">
               <Label>Ano</Label>
-              <Select value={String(ano)} onValueChange={v => setAno(Number(v))}>
+              <Select value={String(ano)} onValueChange={v => { setAno(Number(v)); setDiaFiltro("todos"); }}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {anos.map(a => <SelectItem key={a} value={String(a)}>{a}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label>Dia</Label>
+              <Select value={diaFiltro} onValueChange={setDiaFiltro} disabled={!secao || diasDisponiveis.length === 0}>
+                <SelectTrigger><SelectValue placeholder="Todos os dias" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os dias</SelectItem>
+                  {diasDisponiveis.map(d => <SelectItem key={d} value={d}>Dia {d}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
           </CardContent>
+
         </Card>
 
         {/* Seções */}
@@ -249,8 +277,8 @@ const Relatorios = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {diasOrdenados.map(dia => (
-                    <div key={dia} className="break-inside-avoid">
+                  {diasOrdenados.map((dia, idx) => (
+                    <div key={dia} className={`day-block ${idx > 0 ? "day-break" : ""}`}>
                       <h3 className="font-bold text-fire-black mb-1">Dia {dia}</h3>
                       <table className="w-full text-sm border border-fire-red/30">
                         <thead>
@@ -274,6 +302,7 @@ const Relatorios = () => {
                   ))}
                 </div>
               )}
+
 
               <div className="text-xs text-muted-foreground mt-6 flex justify-between print:mt-4">
                 <span>Emitido em: {new Date().toLocaleString("pt-BR")}</span>
