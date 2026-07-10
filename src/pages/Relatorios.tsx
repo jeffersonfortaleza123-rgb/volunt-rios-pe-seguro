@@ -106,18 +106,27 @@ const Relatorios = () => {
     doc.setFontSize(10);
     doc.text(`Competência: ${competencia}`, 105, 28, { align: "center" });
 
-    let cursorY = 36;
-    diasOrdenados.forEach(dia => {
-      if (cursorY > 260) {
+    diasOrdenados.forEach((dia, idx) => {
+      if (idx > 0) {
+        // uma página por dia
         doc.addPage();
-        cursorY = 20;
       }
-      doc.setFontSize(11);
+      // cabeçalho da página do dia
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text(titulo, 105, 15, { align: "center" });
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      doc.text(subtitulo, 105, 22, { align: "center" });
+      doc.setFontSize(10);
+      doc.text(`Competência: ${competencia}`, 105, 28, { align: "center" });
+
+      let cursorY = 40;
+      doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
       doc.text(`Dia ${dia}`, 14, cursorY);
-      cursorY += 2;
       autoTable(doc, {
-        startY: cursorY + 2,
+        startY: cursorY + 3,
         head: [["Matrícula", "Posto/Graduação", "Nome de Guerra"]],
         body: dadosPorDia[dia].map(v => [v.matricula, v.posto_graduacao, v.nome_guerra]),
         theme: "grid",
@@ -125,9 +134,8 @@ const Relatorios = () => {
         styles: { fontSize: 9 },
         margin: { left: 14, right: 14 },
       });
-      // @ts-ignore
-      cursorY = (doc as any).lastAutoTable.finalY + 6;
     });
+
 
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
