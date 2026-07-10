@@ -79,10 +79,16 @@ const Relatorios = () => {
     return map;
   }, [voluntarios, mes, ano, secao]);
 
-  const diasOrdenados = useMemo(
+  const diasOrdenados = useMemo(() => {
+    const todos = Object.keys(dadosPorDia).sort((a, b) => Number(a) - Number(b));
+    return diaFiltro === "todos" ? todos : todos.filter(d => d === diaFiltro);
+  }, [dadosPorDia, diaFiltro]);
+
+  const diasDisponiveis = useMemo(
     () => Object.keys(dadosPorDia).sort((a, b) => Number(a) - Number(b)),
     [dadosPorDia]
   );
+
 
   const handlePrint = () => window.print();
 
