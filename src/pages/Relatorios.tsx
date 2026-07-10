@@ -272,8 +272,8 @@ const Relatorios = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {diasOrdenados.map(dia => (
-                    <div key={dia} className="break-inside-avoid">
+                  {diasOrdenados.map((dia, idx) => (
+                    <div key={dia} className={`day-block ${idx > 0 ? "day-break" : ""}`}>
                       <h3 className="font-bold text-fire-black mb-1">Dia {dia}</h3>
                       <table className="w-full text-sm border border-fire-red/30">
                         <thead>
@@ -297,6 +297,7 @@ const Relatorios = () => {
                   ))}
                 </div>
               )}
+
 
               <div className="text-xs text-muted-foreground mt-6 flex justify-between print:mt-4">
                 <span>Emitido em: {new Date().toLocaleString("pt-BR")}</span>
