@@ -34,11 +34,13 @@ const Relatorios = () => {
   const [mes, setMes] = useState<number>(now.getMonth());
   const [ano, setAno] = useState<number>(now.getFullYear());
   const [secao, setSecao] = useState<string>("");
+  const [diaFiltro, setDiaFiltro] = useState<string>("todos");
 
   const voluntarios: Voluntario[] = useMemo(
     () => JSON.parse(localStorage.getItem("voluntarios") || "[]"),
     []
   );
+
 
   const anos = useMemo(() => {
     const set = new Set<number>([now.getFullYear()]);
