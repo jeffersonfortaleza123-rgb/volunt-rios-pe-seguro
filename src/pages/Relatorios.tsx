@@ -145,23 +145,28 @@ const Relatorios = () => {
   };
 
   const handleExportExcel = () => {
-    const rows: (string | number)[][] = [
-      ["Corpo de Bombeiros Militar"],
-      [`Escala de Voluntariado - ${secao}`],
-      [`Competência: ${MESES[mes]} / ${ano}`],
-      [],
-    ];
-    diasOrdenados.forEach(dia => {
-      rows.push([`Dia ${dia}`]);
-      rows.push(["Matrícula", "Posto/Graduação", "Nome de Guerra"]);
-      dadosPorDia[dia].forEach(v => rows.push([v.matricula, v.posto_graduacao, v.nome_guerra]));
-      rows.push([]);
-    });
-    const ws = XLSX.utils.aoa_to_sheet(rows);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, secao || "Relatório");
-    XLSX.writeFile(wb, `relatorio-${secao}-${MESES[mes]}-${ano}.xlsx`);
+    diasOrdenados.forEach(dia => {
+      const rows: (string | number)[][] = [
+        ["Corpo de Bombeiros Militar"],
+        [`Escala de Voluntariado - ${secao}`],
+        [`Competência: ${MESES[mes]} / ${ano}`],
+        [`Dia ${dia}`],
+        [],
+        ["Matrícula", "Posto/Graduação", "Nome de Guerra"],
+      ];
+      dadosPorDia[dia].forEach(v => rows.push([v.matricula, v.posto_graduacao, v.nome_guerra]));
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, `Dia ${dia}`);
+    });
+    if (diasOrdenados.length === 0) {
+      const ws = XLSX.utils.aoa_to_sheet([["Sem registros"]]);
+      XLSX.utils.book_append_sheet(wb, ws, "Vazio");
+    }
+    const sufixo = diaFiltro === "todos" ? "" : `-dia-${diaFiltro}`;
+    XLSX.writeFile(wb, `relatorio-${secao}-${MESES[mes]}-${ano}${sufixo}.xlsx`);
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-fire-light via-background to-fire-gray p-4">
