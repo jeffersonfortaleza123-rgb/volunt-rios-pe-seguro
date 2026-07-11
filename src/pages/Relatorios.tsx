@@ -73,7 +73,7 @@ const Relatorios = () => {
       map[k].sort((a, b) => {
         const r = postoRank(a.posto_graduacao) - postoRank(b.posto_graduacao);
         if (r !== 0) return r;
-        return a.nome_guerra.localeCompare(b.nome_guerra, "pt-BR");
+        return a.matricula.localeCompare(b.matricula, "pt-BR", { numeric: true });
       });
     });
     return map;
