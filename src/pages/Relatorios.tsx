@@ -93,52 +93,63 @@ const Relatorios = () => {
   const handlePrint = () => window.print();
 
   const handleExportPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const marginX = 8;
+    const marginTop = 8;
+    const marginBottom = 10;
     const emissao = new Date().toLocaleString("pt-BR");
     const titulo = `Corpo de Bombeiros Militar`;
     const subtitulo = `Escala de Voluntariado - ${secao}`;
     const competencia = `${MESES[mes]} / ${ano}`;
 
-
-
-
-    diasOrdenados.forEach((dia, idx) => {
-      if (idx > 0) {
-        // uma página por dia
-        doc.addPage();
-      }
-      // cabeçalho da página do dia
-      doc.setFontSize(14);
+    const drawHeader = () => {
+      doc.setFontSize(11);
       doc.setFont("helvetica", "bold");
-      doc.text(titulo, 105, 15, { align: "center" });
-      doc.setFontSize(12);
+      doc.text(titulo, pageW / 2, marginTop + 2, { align: "center" });
+      doc.setFontSize(9);
       doc.setFont("helvetica", "normal");
-      doc.text(subtitulo, 105, 22, { align: "center" });
-      doc.setFontSize(10);
-      doc.text(`Competência: ${competencia}`, 105, 28, { align: "center" });
+      doc.text(`${subtitulo}  •  Competência: ${competencia}`, pageW / 2, marginTop + 7, { align: "center" });
+    };
 
-      let cursorY = 40;
-      doc.setFontSize(12);
+    drawHeader();
+    let cursorY = marginTop + 11;
+
+    diasOrdenados.forEach((dia) => {
+      // Add space title for the day
+      doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
-      doc.text(`Dia ${dia}`, 14, cursorY);
-      autoTable(doc, {
-        startY: cursorY + 3,
-        head: [["Matrícula", "Posto/Graduação", "Nome de Guerra"]],
-        body: dadosPorDia[dia].map(v => [v.matricula, v.posto_graduacao, v.nome_guerra]),
-        theme: "grid",
-        headStyles: { fillColor: [163, 22, 33] },
-        styles: { fontSize: 9 },
-        margin: { left: 14, right: 14 },
-      });
-    });
+      doc.text(`Dia ${dia}`, marginX, cursorY);
+      cursorY += 1;
 
+      autoTable(doc, {
+        startY: cursorY,
+        head: [["Posto/Graduação", "Matrícula", "Nome de Guerra"]],
+        body: dadosPorDia[dia].map(v => [v.posto_graduacao, v.matricula, v.nome_guerra]),
+        theme: "grid",
+        headStyles: { fillColor: [163, 22, 33], fontSize: 8, cellPadding: 1 },
+        bodyStyles: { fontSize: 8, cellPadding: 1 },
+        styles: { overflow: "linebreak" },
+        margin: { left: marginX, right: marginX, top: marginTop + 10, bottom: marginBottom },
+        didDrawPage: () => drawHeader(),
+      });
+      // @ts-ignore
+      cursorY = (doc as any).lastAutoTable.finalY + 3;
+
+      if (cursorY > pageH - marginBottom - 15) {
+        doc.addPage();
+        drawHeader();
+        cursorY = marginTop + 11;
+      }
+    });
 
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
-      doc.setFontSize(8);
-      doc.text(`Emitido em ${emissao}`, 14, 290);
-      doc.text(`Página ${i} de ${pageCount}`, 196, 290, { align: "right" });
+      doc.setFontSize(7);
+      doc.text(`Emitido em ${emissao}`, marginX, pageH - 4);
+      doc.text(`Página ${i} de ${pageCount}`, pageW - marginX, pageH - 4, { align: "right" });
     }
 
     doc.save(`relatorio-${secao}-${MESES[mes]}-${ano}.pdf`);
