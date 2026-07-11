@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Calendar as CalendarIcon, LogOut, Flame } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { logAudit, competenciaFromDates } from "@/lib/audit";
 
 const SECOES = ["Primeira Seção", "Segunda Seção", "Terceira Seção", "Quarta Seção"];
 
@@ -66,6 +67,7 @@ const Militar = () => {
 
     try {
       const voluntarioData = {
+        id: crypto.randomUUID(),
         nome: militarInfo.nome,
         nome_guerra: militarInfo.nomeGuerra || "",
         posto_graduacao: militarInfo.posto || "",
@@ -80,6 +82,17 @@ const Militar = () => {
       const existingData = JSON.parse(localStorage.getItem("voluntarios") || "[]");
       existingData.push(voluntarioData);
       localStorage.setItem("voluntarios", JSON.stringify(existingData));
+
+      logAudit({
+        administrador: "Autoinscrição",
+        acao: "Nova inscrição",
+        nome_guerra: voluntarioData.nome_guerra,
+        matricula: voluntarioData.matricula,
+        posto_graduacao: voluntarioData.posto_graduacao,
+        secao: voluntarioData.secao,
+        competencia: competenciaFromDates(voluntarioData.datasSelecionadas),
+        snapshot: voluntarioData,
+      });
 
       setIsSubmitted(true);
       toast({

@@ -20,6 +20,8 @@ const Login = () => {
 
   const handleEscalanteLogin = () => {
     if (credentials.usuario === "Escalante" && credentials.senha === "3g") {
+      sessionStorage.setItem("escalanteAuth", "1");
+      sessionStorage.setItem("escalanteNome", credentials.usuario);
       navigate("/escalante");
     } else {
       toast({
