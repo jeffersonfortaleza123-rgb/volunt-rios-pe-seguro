@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, Calendar, Users, Flame, FileText } from "lucide-react";
+import { Shield, LogOut, Calendar, Users, Flame, FileText, ClipboardList, History } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 
 interface Voluntario {
@@ -45,6 +45,8 @@ const Escalante = () => {
   }, []);
 
   const handleLogout = () => {
+    sessionStorage.removeItem("escalanteAuth");
+    sessionStorage.removeItem("escalanteNome");
     navigate("/");
   };
 
@@ -77,9 +79,15 @@ const Escalante = () => {
             <h1 className="text-2xl font-bold text-fire-black">Painel do Escalante</h1>
             <p className="text-muted-foreground">{getCurrentMonthName()} de {new Date().getFullYear()}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button asChild size="sm" className="bg-fire-red hover:bg-fire-red-dark">
               <Link to="/relatorios"><FileText className="h-4 w-4 mr-2" />Relatórios</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
+              <Link to="/inscricoes"><ClipboardList className="h-4 w-4 mr-2" />Inscrições</Link>
+            </Button>
+            <Button asChild size="sm" variant="ghost" className="text-fire-black hover:bg-fire-red/10">
+              <Link to="/auditoria" title="Histórico de auditoria"><History className="h-4 w-4 mr-2" />Histórico</Link>
             </Button>
             <Button onClick={handleLogout} variant="outline" size="sm" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
               <LogOut className="h-4 w-4" />
