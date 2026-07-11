@@ -130,101 +130,23 @@ const Escalante = () => {
           </Card>
         </div>
 
-        {/* Report */}
+        {/* Acesso aos Relatórios por Seção */}
         <Card className="shadow-lg border-fire-red/20">
           <CardHeader>
             <CardTitle className="text-fire-black flex items-center gap-2">
-              <Flame className="h-5 w-5 text-fire-red" />
-              Relatório por Dia
+              <FileText className="h-5 w-5 text-fire-red" />
+              Relatórios por Seção
             </CardTitle>
             <CardDescription>
-              Bombeiros voluntários disponíveis para cada dia do mês atual
+              Gere as escalas organizadas por Seção, Dia e antiguidade militar.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {getDaysInMonth().map(day => (
-                <div key={day} className="flex items-start gap-4 p-3 border border-fire-red/20 rounded-lg hover:bg-fire-light/50 transition-colors">
-                  <div className="min-w-[3rem]">
-                    <Badge variant="outline" className="text-sm font-mono border-fire-red text-fire-red">
-                      {day}
-                    </Badge>
-                  </div>
-                  <div className="flex-1">
-                    {relatorioDias[day] && relatorioDias[day].length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {relatorioDias[day].map((nome, index) => (
-                          <span key={index} className="text-fire-black font-medium">
-                            {nome}
-                            {index < relatorioDias[day].length - 1 && ", "}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground italic">-</span>
-                    )}
-                  </div>
-                  {relatorioDias[day] && (
-                    <Badge variant="secondary" className="ml-auto bg-fire-gray text-fire-black border border-fire-red/20">
-                      {relatorioDias[day].length}
-                    </Badge>
-                  )}
-                </div>
-              ))}
-            </div>
+            <Button asChild className="bg-fire-red hover:bg-fire-red-dark">
+              <Link to="/relatorios"><FileText className="h-4 w-4 mr-2" />Abrir Relatórios por Seção</Link>
+            </Button>
           </CardContent>
         </Card>
-
-        {/* Detailed Volunteers List */}
-        {voluntarios.length > 0 && (
-          <Card className="shadow-lg border-fire-red/20">
-            <CardHeader>
-              <CardTitle className="text-fire-black">Lista Detalhada de Bombeiros</CardTitle>
-              <CardDescription>
-                Informações completas dos bombeiros militares que se voluntariaram
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {voluntarios.map((voluntario, index) => (
-                  <div key={index} className="border border-fire-red/20 rounded-lg p-4 bg-card shadow-md">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h4 className="font-semibold text-fire-black">{voluntario.nome}</h4>
-                        {voluntario.posto_graduacao && (
-                          <p className="text-sm text-fire-red font-semibold">Posto/Graduação: {voluntario.posto_graduacao}</p>
-                        )}
-                        {voluntario.nome_guerra && (
-                          <p className="text-sm text-fire-red font-medium">Nome de Guerra: {voluntario.nome_guerra}</p>
-                        )}
-                        <p className="text-sm text-muted-foreground">Matrícula: {voluntario.matricula}</p>
-                        {voluntario.email && (
-                          <p className="text-sm text-muted-foreground">E-mail: {voluntario.email}</p>
-                        )}
-                        {voluntario.secao && (
-                          <p className="text-sm text-muted-foreground">Seção: {voluntario.secao}</p>
-                        )}
-                      </div>
-                      <Badge variant="secondary" className="bg-fire-gray text-fire-black border border-fire-red/20">
-                        {voluntario.datasSelecionadas.length} {voluntario.datasSelecionadas.length === 1 ? 'dia' : 'dias'}
-                      </Badge>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {voluntario.datasSelecionadas.map((data, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs border-fire-red/30">
-                          {new Date(data).toLocaleDateString('pt-BR')}
-                        </Badge>
-                      ))}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Enviado em: {new Date(voluntario.created_at).toLocaleString('pt-BR')}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {voluntarios.length === 0 && (
           <Card className="shadow-lg border-fire-red/20">
