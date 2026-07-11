@@ -74,7 +74,7 @@ const Escalante = () => {
             <Badge variant="outline" className="mb-2 bg-fire-red text-primary-foreground border-fire-red shadow-fire">
               🛡️ Comandante
             </Badge>
-            <h1 className="text-2xl font-bold text-fire-black">Relatório de Voluntários</h1>
+            <h1 className="text-2xl font-bold text-fire-black">Painel do Escalante</h1>
             <p className="text-muted-foreground">{getCurrentMonthName()} de {new Date().getFullYear()}</p>
           </div>
           <div className="flex gap-2">
