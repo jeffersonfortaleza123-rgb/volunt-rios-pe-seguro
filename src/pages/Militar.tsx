@@ -66,10 +66,38 @@ const Militar = () => {
     }
 
     try {
+      const compKey = (ds: string) => {
+        const d = new Date(ds);
+        return `${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+      };
+      const selectedComps = new Set(
+        selectedDates.map(d => `${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`)
+      );
+      const existingData = JSON.parse(localStorage.getItem("voluntarios") || "[]");
+      const mat = (militarInfo.matricula || "").trim();
+      const ng = (militarInfo.nomeGuerra || "").trim().toUpperCase();
+      const duplicated = existingData.some((v: any) => {
+        const sameMat = (v.matricula || "").trim() === mat;
+        const sameNg = (v.nome_guerra || "").trim().toUpperCase() === ng;
+        if (!sameMat && !sameNg) return false;
+        const vComps = new Set((v.datasSelecionadas || []).map(compKey));
+        for (const c of selectedComps) if (vComps.has(c)) return true;
+        return false;
+      });
+      if (duplicated) {
+        toast({
+          title: "Inscrição duplicada",
+          description:
+            "Você já possui uma inscrição cadastrada para esta competência. Caso seja necessário realizar alterações, entre em contato com o administrador do sistema.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const voluntarioData = {
         id: crypto.randomUUID(),
         nome: militarInfo.nome,
-        nome_guerra: militarInfo.nomeGuerra || "",
+        nome_guerra: (militarInfo.nomeGuerra || "").toUpperCase(),
         posto_graduacao: militarInfo.posto || "",
         matricula: militarInfo.matricula,
         email: militarInfo.email || "",
@@ -79,7 +107,6 @@ const Militar = () => {
         created_at: new Date().toISOString()
       };
 
-      const existingData = JSON.parse(localStorage.getItem("voluntarios") || "[]");
       existingData.push(voluntarioData);
       localStorage.setItem("voluntarios", JSON.stringify(existingData));
 

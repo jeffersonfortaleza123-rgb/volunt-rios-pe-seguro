@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Printer, FileDown, FileSpreadsheet, Flame } from "lucide-react";
 import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+
 import * as XLSX from "xlsx";
 import { postoRank } from "@/lib/postos";
 
@@ -93,63 +93,76 @@ const Relatorios = () => {
   const handlePrint = () => window.print();
 
   const handleExportPDF = () => {
-    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-    const pageW = doc.internal.pageSize.getWidth();
-    const pageH = doc.internal.pageSize.getHeight();
-    const marginX = 8;
-    const marginTop = 8;
-    const marginBottom = 10;
-    const emissao = new Date().toLocaleString("pt-BR");
-    const titulo = `Corpo de Bombeiros Militar`;
-    const subtitulo = `Escala de Voluntariado - ${secao}`;
-    const competencia = `${MESES[mes]} / ${ano}`;
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const pageW = 210, pageH = 297;
+    const mx = 8, my = 8;
+    const cols = 3, gap = 3;
+    const cardW = (pageW - mx * 2 - gap * (cols - 1)) / cols;
+    const mesUpper = MESES[mes].toUpperCase();
 
-    const drawHeader = () => {
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text(titulo, pageW / 2, marginTop + 2, { align: "center" });
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "normal");
-      doc.text(`${subtitulo}  •  Competência: ${competencia}`, pageW / 2, marginTop + 7, { align: "center" });
+    const drawTitle = () => {
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      doc.text("Corpo de Bombeiros Militar", pageW / 2, my + 3, { align: "center" });
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(`Escala de Voluntariado — ${secao} • ${MESES[mes]}/${ano}`, pageW / 2, my + 7, { align: "center" });
     };
 
-    drawHeader();
-    let cursorY = marginTop + 11;
+    const startY = my + 11;
+    const colX = Array.from({ length: cols }, (_, i) => mx + i * (cardW + gap));
+    const colY = Array(cols).fill(startY);
+
+    drawTitle();
+
+    const rowH = 3.2, headerH = 4.5, colHdrH = 3.6, padY = 1.2;
 
     diasOrdenados.forEach((dia) => {
-      // Add space title for the day
-      doc.setFontSize(9);
-      doc.setFont("helvetica", "bold");
-      doc.text(`Dia ${dia}`, marginX, cursorY);
-      cursorY += 1;
+      const rows = dadosPorDia[dia];
+      const cardH = headerH + colHdrH + rows.length * rowH + padY;
 
-      autoTable(doc, {
-        startY: cursorY,
-        head: [["Posto/Graduação", "Matrícula", "Nome de Guerra"]],
-        body: dadosPorDia[dia].map(v => [v.posto_graduacao, v.matricula, v.nome_guerra]),
-        theme: "grid",
-        headStyles: { fillColor: [163, 22, 33], fontSize: 8, cellPadding: 1 },
-        bodyStyles: { fontSize: 8, cellPadding: 1 },
-        styles: { overflow: "linebreak" },
-        margin: { left: marginX, right: marginX, top: marginTop + 10, bottom: marginBottom },
-        didDrawPage: () => drawHeader(),
-      });
-      // @ts-ignore
-      cursorY = (doc as any).lastAutoTable.finalY + 3;
+      let ci = 0;
+      for (let i = 1; i < cols; i++) if (colY[i] < colY[ci]) ci = i;
 
-      if (cursorY > pageH - marginBottom - 15) {
+      if (colY[ci] + cardH > pageH - my) {
         doc.addPage();
-        drawHeader();
-        cursorY = marginTop + 11;
+        drawTitle();
+        colY.fill(startY);
+        ci = 0;
       }
+
+      const x = colX[ci], y = colY[ci];
+      doc.setDrawColor(163, 22, 33).setLineWidth(0.2);
+      doc.rect(x, y, cardW, cardH);
+      doc.setFillColor(163, 22, 33);
+      doc.rect(x, y, cardW, headerH, "F");
+      doc.setTextColor(255, 255, 255).setFont("helvetica", "bold").setFontSize(7);
+      doc.text(`DIA ${dia} - ${mesUpper}/${ano}`, x + cardW / 2, y + headerH - 1.4, { align: "center" });
+
+      doc.setTextColor(0, 0, 0).setFontSize(6).setFont("helvetica", "bold");
+      const c1 = x + 1, c2 = x + cardW * 0.48, c3 = x + cardW * 0.7;
+      let ry = y + headerH + colHdrH - 0.7;
+      doc.text("Posto/Grad.", c1, ry);
+      doc.text("Matrícula", c2, ry);
+      doc.text("Nome Guerra", c3, ry);
+      doc.setDrawColor(163, 22, 33).setLineWidth(0.1);
+      doc.line(x, ry + 0.6, x + cardW, ry + 0.6);
+      ry += rowH;
+      doc.setFont("helvetica", "normal");
+      rows.forEach((v) => {
+        doc.text(String(v.posto_graduacao).slice(0, 16), c1, ry);
+        doc.text(v.matricula, c2, ry);
+        doc.text(String(v.nome_guerra).slice(0, 14), c3, ry);
+        ry += rowH;
+      });
+
+      colY[ci] = y + cardH + gap;
     });
 
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
-      doc.setFontSize(7);
-      doc.text(`Emitido em ${emissao}`, marginX, pageH - 4);
-      doc.text(`Página ${i} de ${pageCount}`, pageW - marginX, pageH - 4, { align: "right" });
+      doc.setFontSize(6).setTextColor(0, 0, 0);
+      doc.text(`Emitido em ${new Date().toLocaleString("pt-BR")}`, mx, pageH - 3);
+      doc.text(`Página ${i}/${pageCount}`, pageW - mx, pageH - 3, { align: "right" });
     }
 
     doc.save(`relatorio-${secao}-${MESES[mes]}-${ano}.pdf`);
@@ -287,24 +300,26 @@ const Relatorios = () => {
                   Nenhum voluntário registrado para esta seção no período.
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {diasOrdenados.map((dia, idx) => (
-                    <div key={dia} className={`day-block ${idx > 0 ? "day-break" : ""}`}>
-                      <h3 className="font-bold text-fire-black mb-1">Dia {dia}</h3>
-                      <table className="w-full text-sm border border-fire-red/30">
+                <div className="report-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                  {diasOrdenados.map((dia) => (
+                    <div key={dia} className="day-card border border-fire-red/40 rounded-md overflow-hidden bg-white">
+                      <div className="bg-fire-red text-white text-center font-bold py-1 text-[11px] leading-tight">
+                        DIA {dia} - {MESES[mes].toUpperCase()}/{ano}
+                      </div>
+                      <table className="w-full text-[10px] leading-tight">
                         <thead>
-                          <tr className="bg-fire-red text-white">
-                            <th className="text-left px-2 py-1 border border-fire-red/30 w-[25%]">Matrícula</th>
-                            <th className="text-left px-2 py-1 border border-fire-red/30 w-[35%]">Posto/Graduação</th>
-                            <th className="text-left px-2 py-1 border border-fire-red/30">Nome de Guerra</th>
+                          <tr className="bg-fire-light text-fire-black">
+                            <th className="text-left px-1 py-0.5 border-b border-fire-red/30">Posto/Grad.</th>
+                            <th className="text-left px-1 py-0.5 border-b border-fire-red/30">Matrícula</th>
+                            <th className="text-left px-1 py-0.5 border-b border-fire-red/30">Nome Guerra</th>
                           </tr>
                         </thead>
                         <tbody>
                           {dadosPorDia[dia].map((v, i) => (
-                            <tr key={i} className="odd:bg-fire-light/40">
-                              <td className="px-2 py-1 border border-fire-red/30">{v.matricula}</td>
-                              <td className="px-2 py-1 border border-fire-red/30">{v.posto_graduacao}</td>
-                              <td className="px-2 py-1 border border-fire-red/30">{v.nome_guerra}</td>
+                            <tr key={i} className="odd:bg-fire-light/30">
+                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap">{v.posto_graduacao}</td>
+                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap">{v.matricula}</td>
+                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap">{v.nome_guerra}</td>
                             </tr>
                           ))}
                         </tbody>
