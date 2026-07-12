@@ -79,6 +79,9 @@ const Escalante = () => {
             <Button asChild size="sm" variant="outline" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
               <Link to="/inscricoes"><ClipboardList className="h-4 w-4 mr-2" />Inscrições</Link>
             </Button>
+            <Button asChild size="sm" variant="outline" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
+              <Link to="/periodos"><CalendarDays className="h-4 w-4 mr-2" />Período</Link>
+            </Button>
             <Button asChild size="sm" variant="ghost" className="text-fire-black hover:bg-fire-red/10">
               <Link to="/auditoria" title="Histórico de auditoria"><History className="h-4 w-4 mr-2" />Histórico</Link>
             </Button>
