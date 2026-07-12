@@ -32,30 +32,44 @@ const Login = () => {
     }
   };
 
+  const maskMatricula = (v: string) => {
+    const d = v.replace(/\D/g, "").slice(0, 7);
+    return d.length <= 6 ? d : `${d.slice(0, 6)}-${d.slice(6)}`;
+  };
+
   const handleMilitarLogin = () => {
     const emailOk = /^\S+@\S+\.\S+$/.test(credentials.email.trim());
+    const matriculaOk = /^\d{6}-\d$/.test(credentials.matricula.trim());
     if (
-      credentials.nome.trim() &&
-      credentials.nomeGuerra.trim() &&
-      credentials.posto.trim() &&
-      credentials.matricula.trim() &&
-      emailOk
+      !credentials.nome.trim() ||
+      !credentials.nomeGuerra.trim() ||
+      !credentials.posto.trim() ||
+      !credentials.matricula.trim() ||
+      !emailOk
     ) {
-      localStorage.setItem("militarInfo", JSON.stringify({
-        nome: credentials.nome,
-        nomeGuerra: credentials.nomeGuerra,
-        posto: credentials.posto,
-        matricula: credentials.matricula,
-        email: credentials.email,
-      }));
-      navigate("/militar");
-    } else {
       toast({
         title: "Dados Incompletos",
         description: "Preencha nome completo, nome de guerra, posto/graduação, matrícula e um e-mail válido.",
         variant: "destructive",
       });
+      return;
     }
+    if (!matriculaOk) {
+      toast({
+        title: "Matrícula inválida",
+        description: "A matrícula deve estar no formato 000000-0.",
+        variant: "destructive",
+      });
+      return;
+    }
+    localStorage.setItem("militarInfo", JSON.stringify({
+      nome: credentials.nome,
+      nomeGuerra: credentials.nomeGuerra.trim().toUpperCase(),
+      posto: credentials.posto,
+      matricula: credentials.matricula.trim(),
+      email: credentials.email,
+    }));
+    navigate("/militar");
   };
 
   if (!loginType) {
@@ -213,10 +227,13 @@ const Login = () => {
                 <Input
                   id="matricula"
                   value={credentials.matricula}
-                  onChange={(e) => setCredentials({...credentials, matricula: e.target.value})}
-                  placeholder="Digite sua matrícula"
+                  onChange={(e) => setCredentials({...credentials, matricula: maskMatricula(e.target.value)})}
+                  placeholder="000000-0"
+                  inputMode="numeric"
+                  maxLength={8}
                   className="border-fire-red/30 focus:border-fire-red"
                 />
+                <p className="text-xs text-muted-foreground">Formato: 000000-0</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-fire-black font-medium">E-mail</Label>
