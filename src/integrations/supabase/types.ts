@@ -14,7 +14,114 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      auditoria: {
+        Row: {
+          acao: string
+          administrador: string
+          alteracoes: Json | null
+          competencia: string | null
+          data: string
+          id: string
+          matricula: string | null
+          nome_guerra: string | null
+          posto_graduacao: string | null
+          secao: string | null
+          snapshot: Json | null
+        }
+        Insert: {
+          acao: string
+          administrador: string
+          alteracoes?: Json | null
+          competencia?: string | null
+          data?: string
+          id?: string
+          matricula?: string | null
+          nome_guerra?: string | null
+          posto_graduacao?: string | null
+          secao?: string | null
+          snapshot?: Json | null
+        }
+        Update: {
+          acao?: string
+          administrador?: string
+          alteracoes?: Json | null
+          competencia?: string | null
+          data?: string
+          id?: string
+          matricula?: string | null
+          nome_guerra?: string | null
+          posto_graduacao?: string | null
+          secao?: string | null
+          snapshot?: Json | null
+        }
+        Relationships: []
+      }
+      periodos_inscricao: {
+        Row: {
+          aberto_manual: boolean | null
+          competencia: string
+          created_at: string
+          data_fim: string
+          data_inicio: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          aberto_manual?: boolean | null
+          competencia: string
+          created_at?: string
+          data_fim: string
+          data_inicio: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          aberto_manual?: boolean | null
+          competencia?: string
+          created_at?: string
+          data_fim?: string
+          data_inicio?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      voluntarios: {
+        Row: {
+          created_at: string
+          datas_selecionadas: string[]
+          email: string | null
+          id: string
+          matricula: string
+          nome: string
+          nome_guerra: string | null
+          posto_graduacao: string | null
+          secao: string | null
+        }
+        Insert: {
+          created_at?: string
+          datas_selecionadas?: string[]
+          email?: string | null
+          id?: string
+          matricula: string
+          nome: string
+          nome_guerra?: string | null
+          posto_graduacao?: string | null
+          secao?: string | null
+        }
+        Update: {
+          created_at?: string
+          datas_selecionadas?: string[]
+          email?: string | null
+          id?: string
+          matricula?: string
+          nome?: string
+          nome_guerra?: string | null
+          posto_graduacao?: string | null
+          secao?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
