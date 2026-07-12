@@ -10,6 +10,7 @@ import Escalante from "./pages/Escalante";
 import Relatorios from "./pages/Relatorios";
 import Inscricoes from "./pages/Inscricoes";
 import Auditoria from "./pages/Auditoria";
+import Periodos from "./pages/Periodos";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
