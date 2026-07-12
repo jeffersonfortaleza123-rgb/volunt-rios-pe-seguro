@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Printer, FileDown, FileSpreadsheet, Flame } from "lucide-react";
 import { Link } from "react-router-dom";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+
 import * as XLSX from "xlsx";
 import { postoRank } from "@/lib/postos";
 
@@ -300,24 +300,26 @@ const Relatorios = () => {
                   Nenhum voluntário registrado para esta seção no período.
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {diasOrdenados.map((dia, idx) => (
-                    <div key={dia} className={`day-block ${idx > 0 ? "day-break" : ""}`}>
-                      <h3 className="font-bold text-fire-black mb-1">Dia {dia}</h3>
-                      <table className="w-full text-sm border border-fire-red/30">
+                <div className="report-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                  {diasOrdenados.map((dia) => (
+                    <div key={dia} className="day-card border border-fire-red/40 rounded-md overflow-hidden bg-white">
+                      <div className="bg-fire-red text-white text-center font-bold py-1 text-[11px] leading-tight">
+                        DIA {dia} - {MESES[mes].toUpperCase()}/{ano}
+                      </div>
+                      <table className="w-full text-[10px] leading-tight">
                         <thead>
-                          <tr className="bg-fire-red text-white">
-                            <th className="text-left px-2 py-1 border border-fire-red/30 w-[25%]">Matrícula</th>
-                            <th className="text-left px-2 py-1 border border-fire-red/30 w-[35%]">Posto/Graduação</th>
-                            <th className="text-left px-2 py-1 border border-fire-red/30">Nome de Guerra</th>
+                          <tr className="bg-fire-light text-fire-black">
+                            <th className="text-left px-1 py-0.5 border-b border-fire-red/30">Posto/Grad.</th>
+                            <th className="text-left px-1 py-0.5 border-b border-fire-red/30">Matrícula</th>
+                            <th className="text-left px-1 py-0.5 border-b border-fire-red/30">Nome Guerra</th>
                           </tr>
                         </thead>
                         <tbody>
                           {dadosPorDia[dia].map((v, i) => (
-                            <tr key={i} className="odd:bg-fire-light/40">
-                              <td className="px-2 py-1 border border-fire-red/30">{v.matricula}</td>
-                              <td className="px-2 py-1 border border-fire-red/30">{v.posto_graduacao}</td>
-                              <td className="px-2 py-1 border border-fire-red/30">{v.nome_guerra}</td>
+                            <tr key={i} className="odd:bg-fire-light/30">
+                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap">{v.posto_graduacao}</td>
+                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap">{v.matricula}</td>
+                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap">{v.nome_guerra}</td>
                             </tr>
                           ))}
                         </tbody>
