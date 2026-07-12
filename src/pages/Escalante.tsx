@@ -2,46 +2,39 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, Calendar, Users, Flame, FileText, ClipboardList, History } from "lucide-react";
+import { LogOut, Calendar, Users, Flame, FileText, ClipboardList, History, CalendarDays } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
-
-interface Voluntario {
-  nome: string;
-  nome_guerra?: string;
-  posto_graduacao?: string;
-  matricula: string;
-  email?: string;
-  secao?: string;
-  datasSelecionadas: string[];
-  jaPreencheu: boolean;
-  created_at: string;
-}
+import { fetchVoluntarios, Voluntario } from "@/lib/db";
+import { supabase } from "@/integrations/supabase/client";
 
 const Escalante = () => {
   const [voluntarios, setVoluntarios] = useState<Voluntario[]>([]);
   const [relatorioDias, setRelatorioDias] = useState<{ [key: string]: string[] }>({});
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Load data from localStorage (in real app, this would be from Supabase)
-    const data = JSON.parse(localStorage.getItem("voluntarios") || "[]");
-    setVoluntarios(data);
-    
-    // Generate report by day
-    const relatorio: { [key: string]: string[] } = {};
-    
-    data.forEach((voluntario: Voluntario) => {
-      voluntario.datasSelecionadas.forEach(data => {
-        const day = new Date(data).getDate().toString().padStart(2, '0');
-        if (!relatorio[day]) {
-          relatorio[day] = [];
-        }
-        const label = voluntario.nome_guerra ? `${voluntario.nome} (${voluntario.nome_guerra})` : voluntario.nome;
-        relatorio[day].push(label);
+  const load = async () => {
+    try {
+      const data = await fetchVoluntarios();
+      setVoluntarios(data);
+      const relatorio: { [key: string]: string[] } = {};
+      data.forEach((v) => {
+        v.datasSelecionadas.forEach((dstr) => {
+          const day = new Date(dstr).getDate().toString().padStart(2, "0");
+          if (!relatorio[day]) relatorio[day] = [];
+          const label = v.nome_guerra ? `${v.nome} (${v.nome_guerra})` : v.nome;
+          relatorio[day].push(label);
+        });
       });
-    });
-    
-    setRelatorioDias(relatorio);
+      setRelatorioDias(relatorio);
+    } catch (e) { console.error(e); }
+  };
+
+  useEffect(() => {
+    load();
+    const ch = supabase.channel("esc-vol-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "voluntarios" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
   }, []);
 
   const handleLogout = () => {
@@ -85,6 +78,9 @@ const Escalante = () => {
             </Button>
             <Button asChild size="sm" variant="outline" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
               <Link to="/inscricoes"><ClipboardList className="h-4 w-4 mr-2" />Inscrições</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
+              <Link to="/periodos"><CalendarDays className="h-4 w-4 mr-2" />Período</Link>
             </Button>
             <Button asChild size="sm" variant="ghost" className="text-fire-black hover:bg-fire-red/10">
               <Link to="/auditoria" title="Histórico de auditoria"><History className="h-4 w-4 mr-2" />Histórico</Link>

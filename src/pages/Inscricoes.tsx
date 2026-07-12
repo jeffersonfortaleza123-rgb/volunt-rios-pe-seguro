@@ -12,21 +12,8 @@ import { ArrowLeft, Trash2, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { isAdmin, currentAdmin, logAudit, competenciaFromDates } from "@/lib/audit";
 import { postoRank } from "@/lib/postos";
-
-interface Voluntario {
-  id?: string;
-  nome: string;
-  nome_guerra?: string;
-  posto_graduacao?: string;
-  matricula: string;
-  email?: string;
-  secao?: string;
-  datasSelecionadas: string[];
-  jaPreencheu: boolean;
-  created_at: string;
-}
-
-const load = (): Voluntario[] => JSON.parse(localStorage.getItem("voluntarios") || "[]");
+import { fetchVoluntarios, deleteVoluntario, Voluntario } from "@/lib/db";
+import { supabase } from "@/integrations/supabase/client";
 
 const Inscricoes = () => {
   const navigate = useNavigate();
@@ -36,15 +23,25 @@ const Inscricoes = () => {
   const [detail, setDetail] = useState<Voluntario | null>(null);
   const [toDelete, setToDelete] = useState<Voluntario | null>(null);
 
+  const load = async () => {
+    try { setItems(await fetchVoluntarios()); }
+    catch (e: any) { toast({ title: "Erro", description: e.message, variant: "destructive" }); }
+  };
+
   useEffect(() => {
     if (!isAdmin()) { navigate("/"); return; }
-    setItems(load());
-  }, [navigate]);
+    load();
+    const ch = supabase.channel("insc-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "voluntarios" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
     const base = [...items].sort((a, b) => {
-      const r = postoRank(a.posto_graduacao) - postoRank(b.posto_graduacao);
+      const r = postoRank(a.posto_graduacao || "") - postoRank(b.posto_graduacao || "");
       if (r !== 0) return r;
       return (a.matricula || "").localeCompare(b.matricula || "", "pt-BR", { numeric: true });
     });
@@ -55,26 +52,27 @@ const Inscricoes = () => {
     );
   }, [items, q]);
 
-  const confirmDelete = () => {
-    if (!toDelete) return;
-    const all = load();
-    const key = (v: Voluntario) => v.id || `${v.matricula}-${v.created_at}`;
-    const next = all.filter(v => key(v) !== key(toDelete));
-    localStorage.setItem("voluntarios", JSON.stringify(next));
-    logAudit({
-      administrador: currentAdmin(),
-      acao: "Exclusão",
-      nome_guerra: toDelete.nome_guerra,
-      matricula: toDelete.matricula,
-      posto_graduacao: toDelete.posto_graduacao,
-      secao: toDelete.secao,
-      competencia: competenciaFromDates(toDelete.datasSelecionadas),
-      snapshot: toDelete,
-    });
-    setItems(next);
-    setToDelete(null);
-    setDetail(null);
-    toast({ title: "Inscrição excluída", description: `${toDelete.nome_guerra || toDelete.nome} removido.` });
+  const confirmDelete = async () => {
+    if (!toDelete?.id) return;
+    try {
+      await deleteVoluntario(toDelete.id);
+      await logAudit({
+        administrador: currentAdmin(),
+        acao: "Exclusão",
+        nome_guerra: toDelete.nome_guerra || undefined,
+        matricula: toDelete.matricula,
+        posto_graduacao: toDelete.posto_graduacao || undefined,
+        secao: toDelete.secao || undefined,
+        competencia: competenciaFromDates(toDelete.datasSelecionadas),
+        snapshot: toDelete,
+      });
+      toast({ title: "Inscrição excluída", description: `${toDelete.nome_guerra || toDelete.nome} removido.` });
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    } finally {
+      setToDelete(null);
+      setDetail(null);
+    }
   };
 
   return (
@@ -113,8 +111,8 @@ const Inscricoes = () => {
                   {filtered.length === 0 && (
                     <tr><td colSpan={6} className="text-center py-4 text-muted-foreground">Nenhuma inscrição.</td></tr>
                   )}
-                  {filtered.map((v, i) => (
-                    <tr key={i} className="odd:bg-fire-light/40 border-t border-fire-red/20">
+                  {filtered.map((v) => (
+                    <tr key={v.id} className="odd:bg-fire-light/40 border-t border-fire-red/20">
                       <td className="px-2 py-1">{v.posto_graduacao}</td>
                       <td className="px-2 py-1">{v.matricula}</td>
                       <td className="px-2 py-1">{v.nome_guerra || v.nome}</td>
@@ -137,7 +135,6 @@ const Inscricoes = () => {
         </Card>
       </div>
 
-      {/* Detail dialog */}
       <AlertDialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -159,17 +156,13 @@ const Inscricoes = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Fechar</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90"
-              onClick={() => detail && setToDelete(detail)}
-            >
+            <AlertDialogAction className="bg-destructive hover:bg-destructive/90" onClick={() => detail && setToDelete(detail)}>
               <Trash2 className="h-4 w-4 mr-2" />Excluir
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete confirm */}
       <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

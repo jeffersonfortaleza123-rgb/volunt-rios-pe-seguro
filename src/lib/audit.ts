@@ -1,39 +1,41 @@
+import { insertAudit } from "./db";
+
 export type AuditAction =
   | "Nova inscrição"
   | "Edição"
   | "Exclusão"
   | "Aprovação"
-  | "Recusa";
+  | "Recusa"
+  | "Período criado"
+  | "Período atualizado"
+  | "Período removido";
 
 export interface AuditEntry {
   id: string;
-  data: string; // ISO
+  data: string;
   administrador: string;
-  acao: AuditAction;
+  acao: AuditAction | string;
   nome_guerra?: string;
   matricula?: string;
   posto_graduacao?: string;
   secao?: string;
-  competencia?: string; // "MM/YYYY"
+  competencia?: string;
   alteracoes?: { campo: string; de: any; para: any }[];
-  snapshot?: any; // Full record snapshot (used on Exclusão)
+  snapshot?: any;
 }
 
-const KEY = "auditoria";
-
-export function logAudit(entry: Omit<AuditEntry, "id" | "data">) {
-  const list: AuditEntry[] = JSON.parse(localStorage.getItem(KEY) || "[]");
-  const rec: AuditEntry = {
-    id: crypto.randomUUID(),
-    data: new Date().toISOString(),
-    ...entry,
-  };
-  list.push(rec);
-  localStorage.setItem(KEY, JSON.stringify(list));
-}
-
-export function getAudit(): AuditEntry[] {
-  return JSON.parse(localStorage.getItem(KEY) || "[]");
+export async function logAudit(entry: Omit<AuditEntry, "id" | "data">) {
+  await insertAudit({
+    administrador: entry.administrador,
+    acao: entry.acao,
+    nome_guerra: entry.nome_guerra,
+    matricula: entry.matricula,
+    posto_graduacao: entry.posto_graduacao,
+    secao: entry.secao,
+    competencia: entry.competencia,
+    alteracoes: entry.alteracoes,
+    snapshot: entry.snapshot,
+  });
 }
 
 export function competenciaFromDates(dates: string[]): string {

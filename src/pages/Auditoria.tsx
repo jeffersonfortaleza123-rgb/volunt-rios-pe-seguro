@@ -7,23 +7,32 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft } from "lucide-react";
-import { getAudit, isAdmin, AuditEntry } from "@/lib/audit";
+import { isAdmin } from "@/lib/audit";
+import { fetchAudit, AuditRow } from "@/lib/db";
+import { supabase } from "@/integrations/supabase/client";
 
-const TIPOS = ["Todas", "Nova inscrição", "Edição", "Exclusão", "Aprovação", "Recusa"];
+const TIPOS = ["Todas", "Nova inscrição", "Edição", "Exclusão", "Período criado", "Período atualizado", "Período removido"];
 
 const Auditoria = () => {
   const navigate = useNavigate();
-  const [entries, setEntries] = useState<AuditEntry[]>([]);
+  const [entries, setEntries] = useState<AuditRow[]>([]);
   const [q, setQ] = useState("");
   const [tipo, setTipo] = useState("Todas");
   const [admin, setAdmin] = useState("");
   const [de, setDe] = useState("");
   const [ate, setAte] = useState("");
 
+  const load = async () => setEntries(await fetchAudit());
+
   useEffect(() => {
     if (!isAdmin()) { navigate("/"); return; }
-    setEntries(getAudit().slice().reverse());
-  }, [navigate]);
+    load();
+    const ch = supabase.channel("audit-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "auditoria" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const admins = useMemo(
     () => Array.from(new Set(entries.map(e => e.administrador))).filter(Boolean),
@@ -116,16 +125,21 @@ const Auditoria = () => {
                     <td className="px-2 py-1">{e.secao}</td>
                     <td className="px-2 py-1">{e.competencia}</td>
                     <td className="px-2 py-1 text-xs">
-                      {e.alteracoes?.length ? (
+                      {Array.isArray(e.alteracoes) && e.alteracoes.length ? (
                         <ul className="list-disc ml-4">
-                          {e.alteracoes.map((a, i) => (
+                          {e.alteracoes.map((a: any, i: number) => (
                             <li key={i}><b>{a.campo}:</b> {String(a.de)} → {String(a.para)}</li>
                           ))}
                         </ul>
-                      ) : e.acao === "Exclusão" && e.snapshot ? (
-                        <div>
-                          <div>E-mail: {e.snapshot.email}</div>
-                          <div>Dias: {(e.snapshot.datasSelecionadas || []).map((d: string) => new Date(d).toLocaleDateString("pt-BR")).join(", ")}</div>
+                      ) : e.snapshot ? (
+                        <div className="text-muted-foreground">
+                          {e.snapshot.email && <div>E-mail: {e.snapshot.email}</div>}
+                          {e.snapshot.datasSelecionadas && (
+                            <div>Dias: {(e.snapshot.datasSelecionadas || []).map((d: string) => new Date(d).toLocaleDateString("pt-BR")).join(", ")}</div>
+                          )}
+                          {e.snapshot.data_inicio && (
+                            <div>Período: {e.snapshot.data_inicio} → {e.snapshot.data_fim}</div>
+                          )}
                         </div>
                       ) : null}
                     </td>

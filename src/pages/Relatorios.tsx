@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,18 +10,8 @@ import jsPDF from "jspdf";
 
 import * as XLSX from "xlsx";
 import { postoRank } from "@/lib/postos";
-
-interface Voluntario {
-  nome: string;
-  nome_guerra?: string;
-  posto_graduacao?: string;
-  matricula: string;
-  email?: string;
-  secao?: string;
-  datasSelecionadas: string[];
-  jaPreencheu: boolean;
-  created_at: string;
-}
+import { fetchVoluntarios, Voluntario } from "@/lib/db";
+import { supabase } from "@/integrations/supabase/client";
 
 const SECOES = ["Primeira Seção", "Segunda Seção", "Terceira Seção", "Quarta Seção"];
 const MESES = [
@@ -35,11 +25,19 @@ const Relatorios = () => {
   const [ano, setAno] = useState<number>(now.getFullYear());
   const [secao, setSecao] = useState<string>("");
   const [diaFiltro, setDiaFiltro] = useState<string>("todos");
+  const [voluntarios, setVoluntarios] = useState<Voluntario[]>([]);
 
-  const voluntarios: Voluntario[] = useMemo(
-    () => JSON.parse(localStorage.getItem("voluntarios") || "[]"),
-    []
-  );
+  useEffect(() => {
+    const load = async () => {
+      try { setVoluntarios(await fetchVoluntarios()); } catch (e) { console.error(e); }
+    };
+    load();
+    const ch = supabase.channel("rel-vol-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "voluntarios" }, load)
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
 
 
   const anos = useMemo(() => {
