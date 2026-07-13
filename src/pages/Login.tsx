@@ -9,8 +9,7 @@ import { Shield, Users, Flame } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { OFICIAIS, PRACAS } from "@/lib/postos";
-import firefighterHelmet from "@/assets/firefighter-helmet.jpg";
-import firefighterEmblem from "@/assets/firefighter-emblem.jpg";
+import brasao from "@/assets/brasao-3gb.png";
 
 const Login = () => {
   const [loginType, setLoginType] = useState<"escalante" | "militar" | null>(null);
@@ -78,8 +77,8 @@ const Login = () => {
         {/* Background images */}
         <div className="absolute inset-0 flex items-center justify-center opacity-10">
           <img 
-            src={firefighterEmblem} 
-            alt="Bombeiro Militar" 
+            src={brasao} 
+            alt="Brasão 3º GB" 
             className="w-96 h-96 object-contain"
           />
         </div>
@@ -89,9 +88,9 @@ const Login = () => {
             <div className="flex justify-center mb-6">
               <div className="relative">
                 <img 
-                  src={firefighterHelmet} 
-                  alt="Capacete de Bombeiro" 
-                  className="w-20 h-20 object-contain filter drop-shadow-lg"
+                  src={brasao} 
+                  alt="Brasão 3º GB" 
+                  className="w-28 h-28 object-contain filter drop-shadow-lg"
                 />
               </div>
             </div>
@@ -139,9 +138,9 @@ const Login = () => {
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <img 
-              src={firefighterHelmet} 
-              alt="Capacete de Bombeiro" 
-              className="w-16 h-16 object-contain"
+              src={brasao} 
+              alt="Brasão 3º GB" 
+              className="w-20 h-20 object-contain"
             />
           </div>
           <CardTitle className="text-fire-black text-xl">
@@ -210,15 +209,23 @@ const Login = () => {
                   <SelectTrigger className="border-fire-red/30 focus:border-fire-red">
                     <SelectValue placeholder="Selecione o posto/graduação" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent
+                    position="popper"
+                    className="max-h-[min(70vh,26rem)] overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)] [-webkit-overflow-scrolling:touch]"
+                  >
                     <SelectGroup>
-                      <SelectLabel>Oficiais</SelectLabel>
-                      {OFICIAIS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                      <SelectLabel className="text-xs py-1">Oficiais</SelectLabel>
+                      {OFICIAIS.map((p) => (
+                        <SelectItem key={p} value={p} className="text-sm py-1.5 pr-2">{p}</SelectItem>
+                      ))}
                     </SelectGroup>
                     <SelectGroup>
-                      <SelectLabel>Praças</SelectLabel>
-                      {PRACAS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                      <SelectLabel className="text-xs py-1">Praças</SelectLabel>
+                      {PRACAS.map((p) => (
+                        <SelectItem key={p} value={p} className="text-sm py-1.5 pr-2">{p}</SelectItem>
+                      ))}
                     </SelectGroup>
+                    <div aria-hidden className="h-2" />
                   </SelectContent>
                 </Select>
               </div>
