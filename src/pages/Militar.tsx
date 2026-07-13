@@ -161,18 +161,21 @@ const Militar = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-fire-light via-background to-fire-gray p-4">
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <Badge variant="outline" className="mb-2 bg-fire-red text-primary-foreground border-fire-red shadow-fire">
-              🔥 Bombeiro Militar
-            </Badge>
-            <h1 className="text-2xl font-bold text-fire-black">Registro de Voluntariado</h1>
-            <p className="text-muted-foreground">Bem-vindo, {militarInfo.nome}</p>
-            {periodo && (
-              <p className="text-xs text-fire-red mt-1">
-                Inscrições abertas até {new Date(periodo.data_fim + "T00:00:00").toLocaleDateString("pt-BR")}
-              </p>
-            )}
+        <div className="flex justify-between items-center gap-3">
+          <div className="flex items-center gap-3">
+            <img src="/brasao-3gb.png" alt="Brasão 3º GB" className="w-14 h-14 object-contain drop-shadow" />
+            <div>
+              <Badge variant="outline" className="mb-2 bg-fire-red text-primary-foreground border-fire-red shadow-fire">
+                🔥 Bombeiro Militar
+              </Badge>
+              <h1 className="text-2xl font-bold text-fire-black">Registro de Voluntariado</h1>
+              <p className="text-muted-foreground">Bem-vindo, {militarInfo.nome}</p>
+              {periodo && (
+                <p className="text-xs text-fire-red mt-1">
+                  Inscrições abertas até {new Date(periodo.data_fim + "T00:00:00").toLocaleDateString("pt-BR")}
+                </p>
+              )}
+            </div>
           </div>
           <Button onClick={handleLogout} variant="outline" size="sm" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
             <LogOut className="h-4 w-4" />
