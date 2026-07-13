@@ -64,13 +64,16 @@ const Escalante = () => {
     <div className="min-h-screen bg-gradient-to-br from-fire-light via-background to-fire-gray p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <Badge variant="outline" className="mb-2 bg-fire-red text-primary-foreground border-fire-red shadow-fire">
-              🛡️ Comandante
-            </Badge>
-            <h1 className="text-2xl font-bold text-fire-black">Painel do Escalante</h1>
-            <p className="text-muted-foreground">{getCurrentMonthName()} de {new Date().getFullYear()}</p>
+        <div className="flex justify-between items-center gap-3">
+          <div className="flex items-center gap-3">
+            <img src="/brasao-3gb.png" alt="Brasão 3º GB" className="w-14 h-14 object-contain drop-shadow" />
+            <div>
+              <Badge variant="outline" className="mb-2 bg-fire-red text-primary-foreground border-fire-red shadow-fire">
+                🛡️ Comandante
+              </Badge>
+              <h1 className="text-2xl font-bold text-fire-black">Painel do Escalante</h1>
+              <p className="text-muted-foreground">{getCurrentMonthName()} de {new Date().getFullYear()}</p>
+            </div>
           </div>
           <div className="flex gap-2 flex-wrap">
             <Button asChild size="sm" className="bg-fire-red hover:bg-fire-red-dark">
