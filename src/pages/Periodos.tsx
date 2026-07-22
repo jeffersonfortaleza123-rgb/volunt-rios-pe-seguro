@@ -56,8 +56,8 @@ const Periodos = () => {
       toast({ title: "Preencha as datas", variant: "destructive" });
       return;
     }
-    if (fim < ini) {
-      toast({ title: "Data final deve ser após a inicial", variant: "destructive" });
+    if (fim <= ini) {
+      toast({ title: "Data final deve ser após a inicial", description: "O encerramento (08:00) precisa ser em dia posterior ao início (08:00).", variant: "destructive" });
       return;
     }
     const comp = `${String(mes + 1).padStart(2, "0")}/${ano}`;
@@ -140,7 +140,7 @@ const Periodos = () => {
               <CalendarDays className="h-5 w-5 text-fire-red" />
               Configurar competência
             </CardTitle>
-            <CardDescription>Defina o período de abertura e encerramento das inscrições.</CardDescription>
+            <CardDescription>As inscrições abrem às 08:00 do dia de início e encerram às 08:00 do dia de encerramento.</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
             <div className="space-y-1">
@@ -158,11 +158,11 @@ const Periodos = () => {
               </Select>
             </div>
             <div className="space-y-1">
-              <Label>Início</Label>
+              <Label>Início (abre às 08:00)</Label>
               <Input type="date" value={ini} onChange={e => setIni(e.target.value)} />
             </div>
             <div className="space-y-1">
-              <Label>Encerramento</Label>
+              <Label>Encerramento (fecha às 08:00)</Label>
               <Input type="date" value={fim} onChange={e => setFim(e.target.value)} />
             </div>
             <Button onClick={salvar} className="bg-fire-red hover:bg-fire-red-dark">Salvar</Button>
@@ -192,8 +192,8 @@ const Periodos = () => {
                 {items.map(p => (
                   <tr key={p.id} className="odd:bg-fire-light/40 border-t border-fire-red/20">
                     <td className="px-2 py-1 font-semibold">{p.competencia}</td>
-                    <td className="px-2 py-1">{new Date(p.data_inicio + "T00:00:00").toLocaleDateString("pt-BR")}</td>
-                    <td className="px-2 py-1">{new Date(p.data_fim + "T00:00:00").toLocaleDateString("pt-BR")}</td>
+                    <td className="px-2 py-1">{new Date(p.data_inicio + "T00:00:00").toLocaleDateString("pt-BR")} às 08:00</td>
+                    <td className="px-2 py-1">{new Date(p.data_fim + "T00:00:00").toLocaleDateString("pt-BR")} às 08:00</td>
                     <td className="px-2 py-1">{statusLabel(p)}</td>
                     <td className="px-2 py-1 text-right space-x-1">
                       <Button size="sm" variant="outline" onClick={() => toggleManual(p, true)} title="Abrir manualmente">
