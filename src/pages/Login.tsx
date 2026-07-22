@@ -184,26 +184,6 @@ const Login = () => {
           ) : (
             <>
               <div className="space-y-2">
-                <Label htmlFor="nome" className="text-fire-black font-medium">Nome Completo</Label>
-                <Input
-                  id="nome"
-                  value={credentials.nome}
-                  onChange={(e) => setCredentials({...credentials, nome: e.target.value})}
-                  placeholder="Digite seu nome completo"
-                  className="border-fire-red/30 focus:border-fire-red"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="nomeGuerra" className="text-fire-black font-medium">Nome de Guerra</Label>
-                <Input
-                  id="nomeGuerra"
-                  value={credentials.nomeGuerra}
-                  onChange={(e) => setCredentials({...credentials, nomeGuerra: e.target.value})}
-                  placeholder="Ex.: SILVA"
-                  className="border-fire-red/30 focus:border-fire-red"
-                />
-              </div>
-              <div className="space-y-2">
                 <Label className="text-fire-black font-medium">Posto/Graduação</Label>
                 <Select value={credentials.posto} onValueChange={(v) => setCredentials({...credentials, posto: v})}>
                   <SelectTrigger className="border-fire-red/30 focus:border-fire-red">
@@ -228,6 +208,26 @@ const Login = () => {
                     <div aria-hidden className="h-2" />
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nome" className="text-fire-black font-medium">Nome Completo</Label>
+                <Input
+                  id="nome"
+                  value={credentials.nome}
+                  onChange={(e) => setCredentials({...credentials, nome: e.target.value})}
+                  placeholder="Digite seu nome completo"
+                  className="border-fire-red/30 focus:border-fire-red"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nomeGuerra" className="text-fire-black font-medium">Nome de Guerra</Label>
+                <Input
+                  id="nomeGuerra"
+                  value={credentials.nomeGuerra}
+                  onChange={(e) => setCredentials({...credentials, nomeGuerra: e.target.value})}
+                  placeholder="Ex.: SILVA"
+                  className="border-fire-red/30 focus:border-fire-red"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="matricula" className="text-fire-black font-medium">Matrícula</Label>
