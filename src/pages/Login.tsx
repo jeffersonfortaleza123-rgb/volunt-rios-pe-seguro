@@ -30,7 +30,7 @@ const Login = () => {
 
   useEffect(() => {
     if (!periodo?.data_fim || !periodoAberto(periodo)) { setTimeLeft(null); return; }
-    const target = new Date(periodo.data_fim + "T23:59:59").getTime();
+    const target = new Date(periodo.data_fim + "T08:00:00").getTime();
     const tick = () => setTimeLeft(Math.max(0, target - Date.now()));
     tick();
     const id = setInterval(tick, 1000);
