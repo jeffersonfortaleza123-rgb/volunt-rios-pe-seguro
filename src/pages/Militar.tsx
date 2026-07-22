@@ -74,13 +74,10 @@ const Militar = () => {
     }
 
     try {
-      const compKey = (ds: string) => {
-        const d = new Date(ds);
-        return `${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
-      };
-      const selectedComps = new Set(
-        selectedDates.map(d => `${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`)
-      );
+      // Regra: uma inscrição por militar por competência (mês/ano da campanha atual).
+      // No mês seguinte, o militar pode preencher novamente.
+      const agora = new Date();
+      const compAtual = `${String(agora.getMonth() + 1).padStart(2, "0")}/${agora.getFullYear()}`;
       const all = await fetchVoluntarios();
       const mat = (militarInfo.matricula || "").trim();
       const ng = (militarInfo.nomeGuerra || "").trim().toUpperCase();
@@ -88,14 +85,14 @@ const Militar = () => {
         const sameMat = (v.matricula || "").trim() === mat;
         const sameNg = (v.nome_guerra || "").trim().toUpperCase() === ng;
         if (!sameMat && !sameNg) return false;
-        const vComps = new Set((v.datasSelecionadas || []).map(compKey));
-        for (const c of selectedComps) if (vComps.has(c)) return true;
-        return false;
+        const d = new Date(v.created_at);
+        const compInscricao = `${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+        return compInscricao === compAtual;
       });
       if (duplicated) {
         toast({
           title: "Inscrição duplicada",
-          description: "Você já possui uma inscrição cadastrada para esta competência. Caso seja necessário realizar alterações, entre em contato com o administrador do sistema.",
+          description: `Você já possui uma inscrição na competência ${compAtual}. Na próxima competência poderá preencher novamente. Para alterações nesta, contate o administrador do sistema.`,
           variant: "destructive",
         });
         return;
