@@ -41,7 +41,7 @@ const Militar = () => {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   useEffect(() => {
     if (!periodo?.data_fim) { setTimeLeft(null); return; }
-    const target = new Date(periodo.data_fim + "T23:59:59").getTime();
+    const target = new Date(periodo.data_fim + "T08:00:00").getTime();
     const tick = () => setTimeLeft(Math.max(0, target - Date.now()));
     tick();
     const id = setInterval(tick, 1000);
@@ -206,7 +206,7 @@ const Militar = () => {
               <p className="text-muted-foreground">Bem-vindo, {militarInfo.nome}</p>
               {periodo && (
                 <p className="text-xs text-fire-red mt-1">
-                  Inscrições abertas até {new Date(periodo.data_fim + "T00:00:00").toLocaleDateString("pt-BR")}
+                  Inscrições abertas até {new Date(periodo.data_fim + "T00:00:00").toLocaleDateString("pt-BR")} às 08:00
                 </p>
               )}
             </div>
