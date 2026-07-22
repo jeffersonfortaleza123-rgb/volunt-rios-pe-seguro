@@ -147,13 +147,23 @@ export async function deletePeriodo(id: string) {
   if (error) throw error;
 }
 
+// Horário fixo das inscrições: abrem às 08:00 do dia inicial
+// e encerram às 08:00 do dia final.
+export const HORA_ABERTURA = "08:00";
+export const HORA_ENCERRAMENTO = "08:00";
+
+export function inicioDoPeriodo(p: Periodo): Date {
+  return new Date(p.data_inicio + "T" + HORA_ABERTURA + ":00");
+}
+
+export function fimDoPeriodo(p: Periodo): Date {
+  return new Date(p.data_fim + "T" + HORA_ENCERRAMENTO + ":00");
+}
+
 export function periodoAberto(p: Periodo | null): boolean {
   if (!p) return false;
   if (p.aberto_manual === true) return true;
   if (p.aberto_manual === false) return false;
   const now = new Date();
-  const hoje = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const ini = new Date(p.data_inicio + "T00:00:00");
-  const fim = new Date(p.data_fim + "T23:59:59");
-  return hoje >= ini && now <= fim;
+  return now >= inicioDoPeriodo(p) && now <= fimDoPeriodo(p);
 }
