@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Users, Flame } from "lucide-react";
+import { Shield, Users, Flame, FileDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { OFICIAIS, PRACAS } from "@/lib/postos";
@@ -125,6 +125,15 @@ const Login = () => {
                 <div className="font-bold text-lg">Bombeiro Militar</div>
                 <div className="text-sm opacity-75">Registrar voluntariado</div>
               </div>
+            </Button>
+
+            <Button
+              onClick={() => navigate("/comprovante")}
+              variant="ghost"
+              className="w-full text-fire-red hover:bg-fire-red/10"
+            >
+              <FileDown className="mr-2 h-4 w-4" />
+              Já se inscreveu? Baixar comprovante
             </Button>
           </div>
         </div>
