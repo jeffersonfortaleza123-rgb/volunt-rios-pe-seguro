@@ -3,11 +3,12 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, LogOut, Flame, Lock } from "lucide-react";
+import { CheckCircle, LogOut, Flame, Lock, Clock, FileDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { logAudit, competenciaFromDates } from "@/lib/audit";
-import { fetchVoluntarios, insertVoluntario, fetchPeriodoByCompetencia, periodoAberto, Periodo } from "@/lib/db";
+import { fetchVoluntarios, insertVoluntario, fetchPeriodoByCompetencia, periodoAberto, Periodo, Voluntario } from "@/lib/db";
+import { gerarComprovantePDF } from "@/lib/comprovante";
 
 const SECOES = ["Primeira Seção", "Segunda Seção", "Terceira Seção", "Quarta Seção"];
 
@@ -16,6 +17,7 @@ const Militar = () => {
   const [secao, setSecao] = useState<string>("");
   const [militarInfo, setMilitarInfo] = useState<any>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [registro, setRegistro] = useState<Voluntario | null>(null);
   const [periodo, setPeriodo] = useState<Periodo | null>(null);
   const [checking, setChecking] = useState(true);
   const { toast } = useToast();
@@ -34,6 +36,28 @@ const Militar = () => {
   }, [navigate]);
 
   const aberto = periodoAberto(periodo);
+
+  // Contagem regressiva para o fim das inscrições
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  useEffect(() => {
+    if (!periodo?.data_fim) { setTimeLeft(null); return; }
+    const target = new Date(periodo.data_fim + "T23:59:59").getTime();
+    const tick = () => setTimeLeft(Math.max(0, target - Date.now()));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [periodo]);
+
+  const countdown = (() => {
+    if (timeLeft === null || timeLeft <= 0) return null;
+    const s = Math.floor(timeLeft / 1000);
+    return {
+      dias: Math.floor(s / 86400),
+      horas: Math.floor((s % 86400) / 3600),
+      min: Math.floor((s % 3600) / 60),
+      seg: s % 60,
+    };
+  })();
 
   const handleDateSelect = (dates: Date[] | undefined) => {
     if (dates) setSelectedDates(Array.isArray(dates) ? dates : [dates]);
@@ -99,6 +123,7 @@ const Militar = () => {
         snapshot: created,
       });
 
+      setRegistro(created);
       setIsSubmitted(true);
       toast({ title: "Formulário enviado com sucesso!", description: "Seus dados de voluntariado foram registrados." });
     } catch (error: any) {
@@ -127,6 +152,18 @@ const Militar = () => {
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
               Você selecionou {selectedDates.length} {selectedDates.length === 1 ? "dia" : "dias"} para voluntariado.
+            </p>
+            {registro && (
+              <Button
+                onClick={() => gerarComprovantePDF(registro)}
+                className="w-full mb-3 bg-fire-red hover:bg-fire-red-dark shadow-fire"
+              >
+                <FileDown className="mr-2 h-4 w-4" />Baixar Comprovante (PDF)
+              </Button>
+            )}
+            <p className="text-xs text-muted-foreground mb-3">
+              Você também pode baixar este comprovante depois, na opção "Comprovante" da tela inicial,
+              usando sua matrícula e nome de guerra.
             </p>
             <Button onClick={handleLogout} variant="outline" className="w-full border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
               <LogOut className="mr-2 h-4 w-4" />Sair
@@ -181,6 +218,32 @@ const Militar = () => {
             <LogOut className="h-4 w-4" />
           </Button>
         </div>
+
+        {aberto && countdown && (
+          <Card className="shadow-lg border-fire-red/40 bg-fire-red text-white">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Clock className="h-5 w-5" />
+                <span className="font-semibold text-sm sm:text-base">As inscrições encerram em:</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2 max-w-md mx-auto text-center">
+                {[
+                  { valor: countdown.dias, rotulo: countdown.dias === 1 ? "dia" : "dias" },
+                  { valor: countdown.horas, rotulo: "horas" },
+                  { valor: countdown.min, rotulo: "min" },
+                  { valor: countdown.seg, rotulo: "seg" },
+                ].map((item) => (
+                  <div key={item.rotulo} className="bg-white/15 rounded-lg py-2 px-1">
+                    <div className="text-2xl sm:text-3xl font-bold tabular-nums">
+                      {String(item.valor).padStart(2, "0")}
+                    </div>
+                    <div className="text-xs uppercase tracking-wide opacity-90">{item.rotulo}</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="shadow-lg border-fire-red/20">
           <CardHeader>
