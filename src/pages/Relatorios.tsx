@@ -199,7 +199,7 @@ const Relatorios = () => {
             <Badge variant="outline" className="mb-2 bg-fire-red text-primary-foreground border-fire-red shadow-fire">
               📋 Relatórios
             </Badge>
-            <h1 className="text-2xl font-bold text-fire-black">Relatórios por Seção</h1>
+            <h1 className="text-2xl font-bold text-gradient-fire">Relatórios por Seção</h1>
             <p className="text-muted-foreground">Selecione a competência e a seção</p>
           </div>
           <Button asChild variant="outline" size="sm" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">

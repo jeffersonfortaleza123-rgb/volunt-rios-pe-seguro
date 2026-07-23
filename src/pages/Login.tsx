@@ -9,7 +9,7 @@ import { Shield, Users, Flame, FileDown, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { OFICIAIS, PRACAS } from "@/lib/postos";
-import { fetchPeriodoByCompetencia, periodoAberto, Periodo } from "@/lib/db";
+import { fetchPeriodoAtivo, periodoAberto, Periodo } from "@/lib/db";
 import brasao from "@/assets/brasao-3gb.png";
 
 const Login = () => {
@@ -23,9 +23,7 @@ const Login = () => {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
-    const now = new Date();
-    const comp = `${String(now.getMonth() + 1).padStart(2, "0")}/${now.getFullYear()}`;
-    fetchPeriodoByCompetencia(comp).then(setPeriodo).catch(() => setPeriodo(null));
+    fetchPeriodoAtivo().then(setPeriodo).catch(() => setPeriodo(null));
   }, []);
 
   useEffect(() => {
@@ -154,7 +152,7 @@ const Login = () => {
             <Badge variant="outline" className="text-lg px-6 py-3 bg-fire-red text-primary-foreground border-fire-red shadow-fire mb-4">
               🔥 Bombeiros Militar
             </Badge>
-            <h1 className="text-3xl font-bold text-fire-black mb-2">Sistema de Escalas</h1>
+            <h1 className="text-3xl font-extrabold text-gradient-fire mb-2">Sistema de Escalas</h1>
             <p className="text-muted-foreground">Corpo de Bombeiros - Voluntariado</p>
           </div>
 

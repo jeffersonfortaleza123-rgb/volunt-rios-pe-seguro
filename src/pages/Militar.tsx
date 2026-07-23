@@ -7,7 +7,7 @@ import { CheckCircle, LogOut, Flame, Lock, Clock, FileDown } from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { logAudit, competenciaFromDates } from "@/lib/audit";
-import { fetchVoluntarios, insertVoluntario, fetchPeriodoByCompetencia, periodoAberto, Periodo, Voluntario } from "@/lib/db";
+import { fetchVoluntarios, insertVoluntario, fetchPeriodoAtivo, periodoAberto, inicioDoPeriodo, fimDoPeriodo, Periodo, Voluntario } from "@/lib/db";
 import { gerarComprovantePDF } from "@/lib/comprovante";
 
 const SECOES = ["Primeira Seção", "Segunda Seção", "Terceira Seção", "Quarta Seção"];
@@ -28,9 +28,7 @@ const Militar = () => {
     if (!info) { navigate("/"); return; }
     setMilitarInfo(JSON.parse(info));
 
-    const now = new Date();
-    const comp = `${String(now.getMonth() + 1).padStart(2, "0")}/${now.getFullYear()}`;
-    fetchPeriodoByCompetencia(comp)
+    fetchPeriodoAtivo()
       .then(p => setPeriodo(p))
       .finally(() => setChecking(false));
   }, [navigate]);
@@ -86,13 +84,18 @@ const Militar = () => {
         const sameNg = (v.nome_guerra || "").trim().toUpperCase() === ng;
         if (!sameMat && !sameNg) return false;
         const d = new Date(v.created_at);
+        // Se há um período vigente, considera duplicada a inscrição feita
+        // dentro da janela dele; senão, mantém a regra por mês do calendário.
+        if (periodo) {
+          return d >= inicioDoPeriodo(periodo) && d <= fimDoPeriodo(periodo);
+        }
         const compInscricao = `${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
         return compInscricao === compAtual;
       });
       if (duplicated) {
         toast({
           title: "Inscrição duplicada",
-          description: `Você já possui uma inscrição na competência ${compAtual}. Na próxima competência poderá preencher novamente. Para alterações nesta, contate o administrador do sistema.`,
+          description: `Você já possui uma inscrição na competência ${periodo?.competencia || compAtual}. Na próxima competência poderá preencher novamente. Para alterações nesta, contate o administrador do sistema.`,
           variant: "destructive",
         });
         return;
@@ -202,7 +205,7 @@ const Militar = () => {
               <Badge variant="outline" className="mb-2 bg-fire-red text-primary-foreground border-fire-red shadow-fire">
                 🔥 Bombeiro Militar
               </Badge>
-              <h1 className="text-2xl font-bold text-fire-black">Registro de Voluntariado</h1>
+              <h1 className="text-2xl font-bold text-gradient-fire">Registro de Voluntariado</h1>
               <p className="text-muted-foreground">Bem-vindo, {militarInfo.nome}</p>
               {periodo && (
                 <p className="text-xs text-fire-red mt-1">
