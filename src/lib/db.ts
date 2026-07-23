@@ -167,3 +167,32 @@ export function periodoAberto(p: Periodo | null): boolean {
   const now = new Date();
   return now >= inicioDoPeriodo(p) && now <= fimDoPeriodo(p);
 }
+
+// Retorna o período vigente para as inscrições, independente da competência
+// cadastrada (corrige o bloqueio quando a competência do período — ex.: 08/2026 —
+// difere do mês do calendário em que os voluntários preenchem — ex.: julho).
+// Prioridade: 1) período aberto manualmente; 2) período dentro da janela de
+// datas agora; 3) o próximo período futuro (para exibir a contagem); 4) o mais recente.
+export async function fetchPeriodoAtivo(): Promise<Periodo | null> {
+  const { data, error } = await supabase
+    .from("periodos_inscricao")
+    .select("*")
+    .order("data_inicio", { ascending: false });
+  if (error) throw error;
+  const items = ((data as Periodo[]) || []);
+  if (items.length === 0) return null;
+
+  const manual = items.find(p => p.aberto_manual === true);
+  if (manual) return manual;
+
+  const now = new Date();
+  const naJanela = items.find(
+    p => p.aberto_manual !== false && now >= inicioDoPeriodo(p) && now <= fimDoPeriodo(p)
+  );
+  if (naJanela) return naJanela;
+
+  const futuros = items
+    .filter(p => p.aberto_manual !== false && inicioDoPeriodo(p) > now)
+    .sort((a, b) => +inicioDoPeriodo(a) - +inicioDoPeriodo(b));
+  return futuros[0] || items[0];
+}
