@@ -64,6 +64,7 @@ export default {
 				},
 				'fire-red': 'hsl(var(--fire-red))',
 				'fire-red-dark': 'hsl(var(--fire-red-dark))',
+				'fire-orange': 'hsl(var(--fire-orange))',
 				'fire-gold': 'hsl(var(--fire-gold))',
 				'fire-black': 'hsl(var(--fire-black))',
 				'fire-gray': 'hsl(var(--fire-gray))',
