@@ -15,54 +15,6 @@ import brasao from "@/assets/brasao-3gb.png";
 const Login = () => {
   const [loginType, setLoginType] = useState<"escalante" | "militar" | null>(null);
   const [credentials, setCredentials] = useState({ usuario: "", senha: "", nome: "", nomeGuerra: "", posto: "", matricula: "", email: "" });
-  const [buscando, setBuscando] = useState(false);
-  const [encontrado, setEncontrado] = useState<boolean | null>(null);
-
-  const SHEET_ID = "1TWD87B5roREK74ai8VNK9SL1DODbyWE4XRK4UITazEo";
-  const GID = "1853790587";
-  const [manualMode, setManualMode] = useState(false);
-
-  const buscarNaPlanilha = async (matricula: string) => {
-    if (!/^\d{6}-\d$/.test(matricula)) return;
-    setBuscando(true);
-    setEncontrado(null);
-    // Tenta 3 proxies diferentes para contornar CORS
-    const proxies = [
-      `https://corsproxy.io/?url=https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv%26gid=${GID}`,
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`)}`,
-      `https://thingproxy.freeboard.io/fetch/https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`,
-    ];
-    let csv = "";
-    for (const url of proxies) {
-      try {
-        const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-        if (res.ok) { csv = await res.text(); break; }
-      } catch { continue; }
-    }
-    if (!csv) {
-      // Nenhum proxy funcionou — oferecer preenchimento manual
-      setBuscando(false);
-      setManualMode(true);
-      setEncontrado(null);
-      return;
-    }
-    const linhas = csv.split("\n").map(l => l.split(",").map(c => c.replace(/^"|"$/g, "").trim()));
-    const linha = linhas.find(l => l[0] === matricula.trim());
-    if (linha && linha[1]) {
-      setCredentials(prev => ({
-        ...prev,
-        posto: linha[1] || "",
-        nomeGuerra: (linha[2] || "").toUpperCase(),
-        nome: linha[3] || "",
-      }));
-      setEncontrado(true);
-      setManualMode(false);
-    } else {
-      setCredentials(prev => ({ ...prev, posto: "", nomeGuerra: "", nome: "" }));
-      setEncontrado(false);
-    }
-    setBuscando(false);
-  };
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -140,17 +92,28 @@ const Login = () => {
   };
 
   const handleMilitarLogin = () => {
+    const emailOk = /^\S+@\S+\.\S+$/.test(credentials.email.trim());
     const matriculaOk = /^\d{6}-\d$/.test(credentials.matricula.trim());
+    if (
+      !credentials.nome.trim() ||
+      !credentials.nomeGuerra.trim() ||
+      !credentials.posto.trim() ||
+      !credentials.matricula.trim() ||
+      !emailOk
+    ) {
+      toast({
+        title: "Dados Incompletos",
+        description: "Preencha nome completo, nome de guerra, posto/graduação, matrícula e um e-mail válido.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (!matriculaOk) {
-      toast({ title: "Matrícula inválida", description: "A matrícula deve estar no formato 000000-0.", variant: "destructive" });
-      return;
-    }
-    if (!encontrado && !manualMode) {
-      toast({ title: "Matrícula inválida", description: "Verifique o número ou use o preenchimento manual.", variant: "destructive" });
-      return;
-    }
-    if ((manualMode || encontrado === false) && (!credentials.nome.trim() || !credentials.posto.trim() || !credentials.nomeGuerra.trim())) {
-      toast({ title: "Dados incompletos", description: "Preencha nome, posto e nome de guerra.", variant: "destructive" });
+      toast({
+        title: "Matrícula inválida",
+        description: "A matrícula deve estar no formato 000000-0.",
+        variant: "destructive",
+      });
       return;
     }
     localStorage.setItem("militarInfo", JSON.stringify({
@@ -158,7 +121,7 @@ const Login = () => {
       nomeGuerra: credentials.nomeGuerra.trim().toUpperCase(),
       posto: credentials.posto,
       matricula: credentials.matricula.trim(),
-      email: "",
+      email: credentials.email,
     }));
     navigate("/militar");
   };
@@ -190,7 +153,7 @@ const Login = () => {
               🔥 Bombeiros Militar
             </Badge>
             <h1 className="text-3xl font-extrabold text-gradient-fire mb-2">Sistema de Escalas</h1>
-            <p className="text-foreground/80">Corpo de Bombeiros - Voluntariado</p>
+            <p className="text-muted-foreground">Corpo de Bombeiros - Voluntariado</p>
           </div>
 
           <CountdownBanner />
@@ -210,7 +173,7 @@ const Login = () => {
 
             <Button
               onClick={() => setLoginType("militar")}
-              className="w-full h-18 bg-card hover:bg-fire-red text-foreground hover:text-white border-2 border-fire-red shadow-lg transition-all duration-300 hover:scale-105 font-semibold"
+              className="w-full h-18 bg-fire-gray hover:bg-fire-red text-fire-black hover:text-primary-foreground border-2 border-fire-red shadow-lg transition-all duration-300 hover:scale-105"
               variant="outline"
               size="lg"
             >
@@ -248,7 +211,7 @@ const Login = () => {
                 className="w-20 h-20 object-contain"
               />
             </div>
-            <CardTitle className="text-foreground text-xl">
+            <CardTitle className="text-fire-black text-xl">
               {loginType === "escalante" ? "Login Comandante" : "Login Bombeiro Militar"}
             </CardTitle>
             <CardDescription>
@@ -262,7 +225,7 @@ const Login = () => {
             {loginType === "escalante" ? (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="usuario" className="text-foreground font-medium">Usuário</Label>
+                  <Label htmlFor="usuario" className="text-fire-black font-medium">Usuário</Label>
                   <Input
                     id="usuario"
                     value={credentials.usuario}
@@ -272,7 +235,7 @@ const Login = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="senha" className="text-foreground font-medium">Senha</Label>
+                  <Label htmlFor="senha" className="text-fire-black font-medium">Senha</Label>
                   <Input
                     id="senha"
                     type="password"
@@ -288,101 +251,76 @@ const Login = () => {
               </>
             ) : (
               <>
-                {encontrado === true && !manualMode && (
-                  <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-3 space-y-1 text-sm">
-                    <p className="text-xs text-green-400 font-semibold uppercase tracking-wide mb-1">✓ Dados encontrados</p>
-                    <p className="text-foreground font-semibold">{credentials.posto}</p>
-                    <p className="text-foreground">{credentials.nome}</p>
-                    <p className="text-muted-foreground">{credentials.nomeGuerra}</p>
-                    <button onClick={() => setManualMode(true)} className="text-xs text-muted-foreground underline mt-1">
-                      Dados incorretos? Preencher manualmente
-                    </button>
-                  </div>
-                )}
-
-                {/* Modo manual: planilha inacessível ou dados incorretos */}
-                {(manualMode || encontrado === false) && (
-                  <div className="space-y-3 rounded-xl border border-fire-red/20 bg-card p-3">
-                    {manualMode && (
-                      <p className="text-xs text-amber-400">⚠️ Não foi possível acessar a planilha automaticamente. Preencha seus dados manualmente.</p>
-                    )}
-                    {encontrado === false && (
-                      <p className="text-xs text-fire-red">Matrícula não encontrada. Verifique ou preencha manualmente.</p>
-                    )}
-                    <div className="space-y-2">
-                      <Label className="text-foreground font-medium text-sm">Posto/Graduação</Label>
-                      <Select value={credentials.posto} onValueChange={(v) => setCredentials({...credentials, posto: v})}>
-                        <SelectTrigger className="border-fire-red/30 focus:border-fire-red">
-                          <SelectValue placeholder="Selecione o posto/graduação" />
-                        </SelectTrigger>
-                        <SelectContent position="popper" className="max-h-[min(70vh,26rem)] overflow-y-auto overscroll-contain">
-                          <SelectGroup>
-                            <SelectLabel className="text-xs py-1">Oficiais</SelectLabel>
-                            {OFICIAIS.map((p) => (
-                              <SelectItem key={p} value={p} className="text-sm py-1.5">{p}</SelectItem>
-                            ))}
-                          </SelectGroup>
-                          <SelectGroup>
-                            <SelectLabel className="text-xs py-1">Praças</SelectLabel>
-                            {PRACAS.map((p) => (
-                              <SelectItem key={p} value={p} className="text-sm py-1.5">{p}</SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-foreground font-medium text-sm">Nome Completo</Label>
-                      <Input
-                        value={credentials.nome}
-                        onChange={(e) => setCredentials({...credentials, nome: e.target.value})}
-                        placeholder="Digite seu nome completo"
-                        className="border-fire-red/30 focus:border-fire-red"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-foreground font-medium text-sm">Nome de Guerra</Label>
-                      <Input
-                        value={credentials.nomeGuerra}
-                        onChange={(e) => setCredentials({...credentials, nomeGuerra: e.target.value.toUpperCase()})}
-                        placeholder="Ex.: SILVA"
-                        className="border-fire-red/30 focus:border-fire-red"
-                      />
-                    </div>
-                  </div>
-                )}
                 <div className="space-y-2">
-                  <Label htmlFor="matricula" className="text-foreground font-medium">Matrícula</Label>
-                  <div className="relative">
-                    <Input
-                      id="matricula"
-                      value={credentials.matricula}
-                      onChange={(e) => {
-                        const masked = maskMatricula(e.target.value);
-                        setCredentials({...credentials, matricula: masked});
-                        if (/^\d{6}-\d$/.test(masked)) buscarNaPlanilha(masked);
-                      }}
-                      placeholder="000000-0"
-                      inputMode="numeric"
-                      maxLength={8}
-                      className="border-fire-red/30 focus:border-fire-red pr-8"
-                    />
-                    {buscando && (
-                      <span className="absolute right-2 top-2.5 text-xs text-muted-foreground animate-pulse">⏳</span>
-                    )}
-                    {encontrado === true && (
-                      <span className="absolute right-2 top-2.5 text-green-400 text-sm">✓</span>
-                    )}
-                    {encontrado === false && (
-                      <span className="absolute right-2 top-2.5 text-fire-red text-sm">✗</span>
-                    )}
-                  </div>
-                  {encontrado === false && (
-                    <p className="text-xs text-fire-red">Matrícula não encontrada na planilha. Verifique o número.</p>
-                  )}
-                  {encontrado === null && <p className="text-xs text-muted-foreground">Formato: 000000-0</p>}
+                  <Label className="text-fire-black font-medium">Posto/Graduação</Label>
+                  <Select value={credentials.posto} onValueChange={(v) => setCredentials({...credentials, posto: v})}>
+                    <SelectTrigger className="border-fire-red/30 focus:border-fire-red">
+                      <SelectValue placeholder="Selecione o posto/graduação" />
+                    </SelectTrigger>
+                    <SelectContent
+                      position="popper"
+                      className="max-h-[min(70vh,26rem)] overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)] [-webkit-overflow-scrolling:touch]"
+                    >
+                      <SelectGroup>
+                        <SelectLabel className="text-xs py-1">Oficiais</SelectLabel>
+                        {OFICIAIS.map((p) => (
+                          <SelectItem key={p} value={p} className="text-sm py-1.5 pr-2">{p}</SelectItem>
+                        ))}
+                      </SelectGroup>
+                      <SelectGroup>
+                        <SelectLabel className="text-xs py-1">Praças</SelectLabel>
+                        {PRACAS.map((p) => (
+                          <SelectItem key={p} value={p} className="text-sm py-1.5 pr-2">{p}</SelectItem>
+                        ))}
+                      </SelectGroup>
+                      <div aria-hidden className="h-2" />
+                    </SelectContent>
+                  </Select>
                 </div>
-
+                <div className="space-y-2">
+                  <Label htmlFor="nome" className="text-fire-black font-medium">Nome Completo</Label>
+                  <Input
+                    id="nome"
+                    value={credentials.nome}
+                    onChange={(e) => setCredentials({...credentials, nome: e.target.value})}
+                    placeholder="Digite seu nome completo"
+                    className="border-fire-red/30 focus:border-fire-red"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="nomeGuerra" className="text-fire-black font-medium">Nome de Guerra</Label>
+                  <Input
+                    id="nomeGuerra"
+                    value={credentials.nomeGuerra}
+                    onChange={(e) => setCredentials({...credentials, nomeGuerra: e.target.value})}
+                    placeholder="Ex.: SILVA"
+                    className="border-fire-red/30 focus:border-fire-red"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="matricula" className="text-fire-black font-medium">Matrícula</Label>
+                  <Input
+                    id="matricula"
+                    value={credentials.matricula}
+                    onChange={(e) => setCredentials({...credentials, matricula: maskMatricula(e.target.value)})}
+                    placeholder="000000-0"
+                    inputMode="numeric"
+                    maxLength={8}
+                    className="border-fire-red/30 focus:border-fire-red"
+                  />
+                  <p className="text-xs text-muted-foreground">Formato: 000000-0</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-fire-black font-medium">E-mail</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={credentials.email}
+                    onChange={(e) => setCredentials({...credentials, email: e.target.value})}
+                    placeholder="seuemail@exemplo.com"
+                    className="border-fire-red/30 focus:border-fire-red"
+                  />
+                </div>
                 <Button onClick={handleMilitarLogin} className="w-full bg-fire-red hover:bg-fire-red-dark shadow-fire">
                   Continuar
                 </Button>
