@@ -18,35 +18,50 @@ const Login = () => {
   const [buscando, setBuscando] = useState(false);
   const [encontrado, setEncontrado] = useState<boolean | null>(null);
 
-  const SHEET_URL = `https://docs.google.com/spreadsheets/d/1TWD87B5roREK74ai8VNK9SL1DODbyWE4XRK4UITazEo/export?format=csv&gid=1853790587`;
+  const SHEET_ID = "1TWD87B5roREK74ai8VNK9SL1DODbyWE4XRK4UITazEo";
+  const GID = "1853790587";
+  const [manualMode, setManualMode] = useState(false);
 
   const buscarNaPlanilha = async (matricula: string) => {
     if (!/^\d{6}-\d$/.test(matricula)) return;
     setBuscando(true);
     setEncontrado(null);
-    try {
-      const res = await fetch(SHEET_URL);
-      const csv = await res.text();
-      const linhas = csv.split("\n").map(l => l.split(",").map(c => c.replace(/^"|"$/g, "").trim()));
-      // Colunas: A=Matrícula, B=Posto/Grad, C=Nome Guerra, D=Nome Completo
-      const linha = linhas.find(l => l[0] === matricula.trim());
-      if (linha) {
-        setCredentials(prev => ({
-          ...prev,
-          posto: linha[1] || "",
-          nomeGuerra: (linha[2] || "").toUpperCase(),
-          nome: linha[3] || "",
-        }));
-        setEncontrado(true);
-      } else {
-        setCredentials(prev => ({ ...prev, posto: "", nomeGuerra: "", nome: "" }));
-        setEncontrado(false);
-      }
-    } catch {
-      setEncontrado(false);
-    } finally {
-      setBuscando(false);
+    // Tenta 3 proxies diferentes para contornar CORS
+    const proxies = [
+      `https://corsproxy.io/?url=https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv%26gid=${GID}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`)}`,
+      `https://thingproxy.freeboard.io/fetch/https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`,
+    ];
+    let csv = "";
+    for (const url of proxies) {
+      try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+        if (res.ok) { csv = await res.text(); break; }
+      } catch { continue; }
     }
+    if (!csv) {
+      // Nenhum proxy funcionou — oferecer preenchimento manual
+      setBuscando(false);
+      setManualMode(true);
+      setEncontrado(null);
+      return;
+    }
+    const linhas = csv.split("\n").map(l => l.split(",").map(c => c.replace(/^"|"$/g, "").trim()));
+    const linha = linhas.find(l => l[0] === matricula.trim());
+    if (linha && linha[1]) {
+      setCredentials(prev => ({
+        ...prev,
+        posto: linha[1] || "",
+        nomeGuerra: (linha[2] || "").toUpperCase(),
+        nome: linha[3] || "",
+      }));
+      setEncontrado(true);
+      setManualMode(false);
+    } else {
+      setCredentials(prev => ({ ...prev, posto: "", nomeGuerra: "", nome: "" }));
+      setEncontrado(false);
+    }
+    setBuscando(false);
   };
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -130,8 +145,12 @@ const Login = () => {
       toast({ title: "Matrícula inválida", description: "A matrícula deve estar no formato 000000-0.", variant: "destructive" });
       return;
     }
-    if (!encontrado) {
-      toast({ title: "Matrícula não encontrada", description: "Verifique o número e tente novamente.", variant: "destructive" });
+    if (!encontrado && !manualMode) {
+      toast({ title: "Matrícula inválida", description: "Verifique o número ou use o preenchimento manual.", variant: "destructive" });
+      return;
+    }
+    if ((manualMode || encontrado === false) && (!credentials.nome.trim() || !credentials.posto.trim() || !credentials.nomeGuerra.trim())) {
+      toast({ title: "Dados incompletos", description: "Preencha nome, posto e nome de guerra.", variant: "destructive" });
       return;
     }
     localStorage.setItem("militarInfo", JSON.stringify({
@@ -269,11 +288,67 @@ const Login = () => {
               </>
             ) : (
               <>
-                {encontrado === true && (
+                {encontrado === true && !manualMode && (
                   <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-3 space-y-1 text-sm">
+                    <p className="text-xs text-green-400 font-semibold uppercase tracking-wide mb-1">✓ Dados encontrados</p>
                     <p className="text-foreground font-semibold">{credentials.posto}</p>
                     <p className="text-foreground">{credentials.nome}</p>
                     <p className="text-muted-foreground">{credentials.nomeGuerra}</p>
+                    <button onClick={() => setManualMode(true)} className="text-xs text-muted-foreground underline mt-1">
+                      Dados incorretos? Preencher manualmente
+                    </button>
+                  </div>
+                )}
+
+                {/* Modo manual: planilha inacessível ou dados incorretos */}
+                {(manualMode || encontrado === false) && (
+                  <div className="space-y-3 rounded-xl border border-fire-red/20 bg-card p-3">
+                    {manualMode && (
+                      <p className="text-xs text-amber-400">⚠️ Não foi possível acessar a planilha automaticamente. Preencha seus dados manualmente.</p>
+                    )}
+                    {encontrado === false && (
+                      <p className="text-xs text-fire-red">Matrícula não encontrada. Verifique ou preencha manualmente.</p>
+                    )}
+                    <div className="space-y-2">
+                      <Label className="text-foreground font-medium text-sm">Posto/Graduação</Label>
+                      <Select value={credentials.posto} onValueChange={(v) => setCredentials({...credentials, posto: v})}>
+                        <SelectTrigger className="border-fire-red/30 focus:border-fire-red">
+                          <SelectValue placeholder="Selecione o posto/graduação" />
+                        </SelectTrigger>
+                        <SelectContent position="popper" className="max-h-[min(70vh,26rem)] overflow-y-auto overscroll-contain">
+                          <SelectGroup>
+                            <SelectLabel className="text-xs py-1">Oficiais</SelectLabel>
+                            {OFICIAIS.map((p) => (
+                              <SelectItem key={p} value={p} className="text-sm py-1.5">{p}</SelectItem>
+                            ))}
+                          </SelectGroup>
+                          <SelectGroup>
+                            <SelectLabel className="text-xs py-1">Praças</SelectLabel>
+                            {PRACAS.map((p) => (
+                              <SelectItem key={p} value={p} className="text-sm py-1.5">{p}</SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-foreground font-medium text-sm">Nome Completo</Label>
+                      <Input
+                        value={credentials.nome}
+                        onChange={(e) => setCredentials({...credentials, nome: e.target.value})}
+                        placeholder="Digite seu nome completo"
+                        className="border-fire-red/30 focus:border-fire-red"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-foreground font-medium text-sm">Nome de Guerra</Label>
+                      <Input
+                        value={credentials.nomeGuerra}
+                        onChange={(e) => setCredentials({...credentials, nomeGuerra: e.target.value.toUpperCase()})}
+                        placeholder="Ex.: SILVA"
+                        className="border-fire-red/30 focus:border-fire-red"
+                      />
+                    </div>
                   </div>
                 )}
                 <div className="space-y-2">
