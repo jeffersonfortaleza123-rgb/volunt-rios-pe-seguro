@@ -92,18 +92,16 @@ const Login = () => {
   };
 
   const handleMilitarLogin = () => {
-    const emailOk = /^\S+@\S+\.\S+$/.test(credentials.email.trim());
     const matriculaOk = /^\d{6}-\d$/.test(credentials.matricula.trim());
     if (
       !credentials.nome.trim() ||
       !credentials.nomeGuerra.trim() ||
       !credentials.posto.trim() ||
-      !credentials.matricula.trim() ||
-      !emailOk
+      !credentials.matricula.trim()
     ) {
       toast({
         title: "Dados Incompletos",
-        description: "Preencha nome completo, nome de guerra, posto/graduação, matrícula e um e-mail válido.",
+        description: "Preencha nome completo, nome de guerra, posto/graduação e matrícula.",
         variant: "destructive",
       });
       return;
@@ -310,17 +308,7 @@ const Login = () => {
                   />
                   <p className="text-xs text-muted-foreground">Formato: 000000-0</p>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-fire-black font-medium">E-mail</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={credentials.email}
-                    onChange={(e) => setCredentials({...credentials, email: e.target.value})}
-                    placeholder="seuemail@exemplo.com"
-                    className="border-fire-red/30 focus:border-fire-red"
-                  />
-                </div>
+
                 <Button onClick={handleMilitarLogin} className="w-full bg-fire-red hover:bg-fire-red-dark shadow-fire">
                   Continuar
                 </Button>
