@@ -153,7 +153,7 @@ const Login = () => {
               🔥 Bombeiros Militar
             </Badge>
             <h1 className="text-3xl font-extrabold text-gradient-fire mb-2">Sistema de Escalas</h1>
-            <p className="text-muted-foreground">Corpo de Bombeiros - Voluntariado</p>
+            <p className="text-foreground/80">Corpo de Bombeiros - Voluntariado</p>
           </div>
 
           <CountdownBanner />
@@ -173,7 +173,7 @@ const Login = () => {
 
             <Button
               onClick={() => setLoginType("militar")}
-              className="w-full h-18 bg-fire-gray hover:bg-fire-red text-fire-black hover:text-primary-foreground border-2 border-fire-red shadow-lg transition-all duration-300 hover:scale-105"
+              className="w-full h-18 bg-card hover:bg-fire-red text-foreground hover:text-white border-2 border-fire-red shadow-lg transition-all duration-300 hover:scale-105 font-semibold"
               variant="outline"
               size="lg"
             >
@@ -211,7 +211,7 @@ const Login = () => {
                 className="w-20 h-20 object-contain"
               />
             </div>
-            <CardTitle className="text-fire-black text-xl">
+            <CardTitle className="text-foreground text-xl">
               {loginType === "escalante" ? "Login Comandante" : "Login Bombeiro Militar"}
             </CardTitle>
             <CardDescription>
@@ -225,7 +225,7 @@ const Login = () => {
             {loginType === "escalante" ? (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="usuario" className="text-fire-black font-medium">Usuário</Label>
+                  <Label htmlFor="usuario" className="text-foreground font-medium">Usuário</Label>
                   <Input
                     id="usuario"
                     value={credentials.usuario}
@@ -235,7 +235,7 @@ const Login = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="senha" className="text-fire-black font-medium">Senha</Label>
+                  <Label htmlFor="senha" className="text-foreground font-medium">Senha</Label>
                   <Input
                     id="senha"
                     type="password"
@@ -252,7 +252,7 @@ const Login = () => {
             ) : (
               <>
                 <div className="space-y-2">
-                  <Label className="text-fire-black font-medium">Posto/Graduação</Label>
+                  <Label className="text-foreground font-medium">Posto/Graduação</Label>
                   <Select value={credentials.posto} onValueChange={(v) => setCredentials({...credentials, posto: v})}>
                     <SelectTrigger className="border-fire-red/30 focus:border-fire-red">
                       <SelectValue placeholder="Selecione o posto/graduação" />
@@ -278,7 +278,7 @@ const Login = () => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="nome" className="text-fire-black font-medium">Nome Completo</Label>
+                  <Label htmlFor="nome" className="text-foreground font-medium">Nome Completo</Label>
                   <Input
                     id="nome"
                     value={credentials.nome}

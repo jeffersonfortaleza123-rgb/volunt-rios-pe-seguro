@@ -90,7 +90,7 @@ const Inscricoes = () => {
 
         <Card className="shadow-lg border-fire-red/20">
           <CardHeader>
-            <CardTitle className="text-fire-black">Lista de Inscrições</CardTitle>
+            <CardTitle className="text-foreground">Lista de Inscrições</CardTitle>
             <CardDescription>Pesquise, visualize ou exclua inscrições.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">

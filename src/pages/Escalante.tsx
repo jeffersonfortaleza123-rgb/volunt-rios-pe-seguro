@@ -85,7 +85,7 @@ const Escalante = () => {
             <Button asChild size="sm" variant="outline" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
               <Link to="/periodos"><CalendarDays className="h-4 w-4 mr-2" />Período</Link>
             </Button>
-            <Button asChild size="sm" variant="ghost" className="text-fire-black hover:bg-fire-red/10">
+            <Button asChild size="sm" variant="ghost" className="text-foreground hover:bg-fire-red/10">
               <Link to="/auditoria" title="Histórico de auditoria"><History className="h-4 w-4 mr-2" />Histórico</Link>
             </Button>
             <Button onClick={handleLogout} variant="outline" size="sm" className="border-fire-red text-fire-red hover:bg-fire-red hover:text-white">
@@ -101,7 +101,7 @@ const Escalante = () => {
               <div className="flex items-center gap-3">
                 <Users className="h-8 w-8 text-fire-red" />
                 <div>
-                  <p className="text-2xl font-bold text-fire-black">{voluntarios.length}</p>
+                  <p className="text-2xl font-bold text-foreground">{voluntarios.length}</p>
                   <p className="text-sm text-muted-foreground">Total de Bombeiros</p>
                 </div>
               </div>
@@ -113,7 +113,7 @@ const Escalante = () => {
               <div className="flex items-center gap-3">
                 <Calendar className="h-8 w-8 text-fire-red" />
                 <div>
-                  <p className="text-2xl font-bold text-fire-black">
+                  <p className="text-2xl font-bold text-foreground">
                     {Object.keys(relatorioDias).length}
                   </p>
                   <p className="text-sm text-muted-foreground">Dias com Voluntários</p>
@@ -127,7 +127,7 @@ const Escalante = () => {
               <div className="flex items-center gap-3">
                 <Flame className="h-8 w-8 text-fire-red" />
                 <div>
-                  <p className="text-2xl font-bold text-fire-black">
+                  <p className="text-2xl font-bold text-foreground">
                     {voluntarios.reduce((total, v) => total + v.datasSelecionadas.length, 0)}
                   </p>
                   <p className="text-sm text-muted-foreground">Total de Escalas</p>
@@ -159,7 +159,7 @@ const Escalante = () => {
           <Card className="shadow-lg border-fire-red/20">
             <CardContent className="p-8 text-center">
               <Flame className="h-12 w-12 text-fire-red mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-fire-black mb-2">Nenhum bombeiro registrado</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">Nenhum bombeiro registrado</h3>
               <p className="text-muted-foreground">
                 Aguardando bombeiros militares se voluntariarem para as escalas do mês.
               </p>

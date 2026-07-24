@@ -67,7 +67,7 @@ const Auditoria = () => {
 
         <Card className="shadow-lg border-fire-red/20">
           <CardHeader>
-            <CardTitle className="text-fire-black">Filtros</CardTitle>
+            <CardTitle className="text-foreground">Filtros</CardTitle>
             <CardDescription>Refine a busca no histórico.</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">

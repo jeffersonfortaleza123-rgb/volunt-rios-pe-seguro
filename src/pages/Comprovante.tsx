@@ -76,14 +76,14 @@ const Comprovante = () => {
             <Badge variant="outline" className="mx-auto mb-2 bg-fire-red text-primary-foreground border-fire-red shadow-fire">
               🔥 Voluntariado PE Seguro
             </Badge>
-            <CardTitle className="text-fire-black text-xl">Comprovante de Inscrição</CardTitle>
+            <CardTitle className="text-foreground text-xl">Comprovante de Inscrição</CardTitle>
             <CardDescription>
               Informe seus dados para baixar o comprovante em PDF.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="matricula" className="text-fire-black font-medium">Matrícula</Label>
+              <Label htmlFor="matricula" className="text-foreground font-medium">Matrícula</Label>
               <Input
                 id="matricula"
                 value={matricula}
@@ -95,7 +95,7 @@ const Comprovante = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="nomeGuerra" className="text-fire-black font-medium">Nome de Guerra</Label>
+              <Label htmlFor="nomeGuerra" className="text-foreground font-medium">Nome de Guerra</Label>
               <Input
                 id="nomeGuerra"
                 value={nomeGuerra}
@@ -126,7 +126,7 @@ const Comprovante = () => {
         {resultados && resultados.length > 0 && (
           <Card className="shadow-xl border-fire-red/20">
             <CardHeader>
-              <CardTitle className="text-fire-black text-base">
+              <CardTitle className="text-foreground text-base">
                 {resultados.length === 1 ? "Inscrição encontrada" : `${resultados.length} inscrições encontradas`}
               </CardTitle>
             </CardHeader>
@@ -137,7 +137,7 @@ const Comprovante = () => {
                   className="flex items-center justify-between gap-3 border border-fire-red/20 rounded-lg p-3"
                 >
                   <div className="text-sm">
-                    <p className="font-semibold text-fire-black">Competência {competenciaDe(v)}</p>
+                    <p className="font-semibold text-foreground">Competência {competenciaDe(v)}</p>
                     <p className="text-muted-foreground">
                       {v.secao || "Seção não informada"} · {v.datasSelecionadas.length}{" "}
                       {v.datasSelecionadas.length === 1 ? "dia" : "dias"}
