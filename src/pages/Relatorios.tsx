@@ -283,13 +283,13 @@ const Relatorios = () => {
               </Button>
             </div>
 
-            <div id="print-area" className="bg-white rounded-lg shadow-lg border border-fire-red/20 p-6 print:shadow-none print:border-0 print:p-0">
+            <div id="print-area" className="bg-white rounded-lg shadow-lg border border-fire-red/20 p-6 print:shadow-none print:border-0 print:p-0 print:[&_*]:!bg-white print:[&_*]:!text-black">
               {/* Cabeçalho impressão */}
               <div className="text-center border-b border-fire-red/40 pb-3 mb-4">
-                <h2 className="text-lg font-bold text-fire-black">Corpo de Bombeiros Militar</h2>
-                <p className="text-sm text-muted-foreground">Escala de Serviço Extraordinário — Voluntariado</p>
-                <p className="text-sm font-semibold text-fire-black mt-1">{secao}</p>
-                <p className="text-sm text-fire-black">Competência: {MESES[mes]} / {ano}</p>
+                <h2 className="text-lg font-bold text-fire-black print:!text-black">Corpo de Bombeiros Militar</h2>
+                <p className="text-sm text-muted-foreground print:!text-black">Escala de Serviço Extraordinário — Voluntariado</p>
+                <p className="text-sm font-semibold text-fire-black mt-1 print:!text-black">{secao}</p>
+                <p className="text-sm print:!text-black">Competência: {MESES[mes]} / {ano}</p>
               </div>
 
               {diasOrdenados.length === 0 ? (
@@ -301,12 +301,12 @@ const Relatorios = () => {
                 <div className="report-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                   {diasOrdenados.map((dia) => (
                     <div key={dia} className="day-card border border-fire-red/40 rounded-md overflow-hidden bg-white">
-                      <div className="bg-fire-red text-white text-center font-bold py-1 text-[11px] leading-tight">
+                      <div className="bg-fire-red text-white text-center font-bold py-1 text-[11px] leading-tight print:!bg-gray-200 print:!text-black">
                         DIA {dia} - {MESES[mes].toUpperCase()}/{ano}
                       </div>
                       <table className="w-full text-[10px] leading-tight">
                         <thead>
-                          <tr className="bg-fire-light text-fire-black">
+                          <tr className="bg-fire-light text-fire-black print:!bg-gray-100 print:!text-black">
                             <th className="text-left px-1 py-0.5 border-b border-fire-red/30">Posto/Grad.</th>
                             <th className="text-left px-1 py-0.5 border-b border-fire-red/30">Matrícula</th>
                             <th className="text-left px-1 py-0.5 border-b border-fire-red/30">Nome Guerra</th>
@@ -314,10 +314,10 @@ const Relatorios = () => {
                         </thead>
                         <tbody>
                           {dadosPorDia[dia].map((v, i) => (
-                            <tr key={i} className="odd:bg-fire-light/30">
-                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap">{v.posto_graduacao}</td>
-                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap">{v.matricula}</td>
-                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap">{v.nome_guerra}</td>
+                            <tr key={i} className="odd:bg-fire-light/30 print:odd:!bg-white">
+                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap print:!text-black print:!bg-white">{v.posto_graduacao}</td>
+                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap print:!text-black print:!bg-white">{v.matricula}</td>
+                              <td className="px-1 py-0.5 border-b border-fire-red/10 whitespace-nowrap print:!text-black print:!bg-white">{v.nome_guerra}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -328,7 +328,7 @@ const Relatorios = () => {
               )}
 
 
-              <div className="text-xs text-muted-foreground mt-6 flex justify-between print:mt-4">
+              <div className="text-xs text-muted-foreground mt-6 flex justify-between print:mt-4 print:!text-black">
                 <span>Emitido em: {new Date().toLocaleString("pt-BR")}</span>
                 <span className="print-page-number" />
               </div>
