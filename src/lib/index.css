@@ -177,16 +177,71 @@
 /* Impressão permanece em fundo branco (relatórios) */
 @media print {
   @page { size: A4 portrait; margin: 6mm; }
-  html, body { background: white !important; }
+
+  /* Fundo branco e letra preta em tudo */
+  html, body, * {
+    background: white !important;
+    background-color: white !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
   .print\:hidden { display: none !important; }
-  #print-area { box-shadow: none !important; border: 0 !important; padding: 0 !important; font-size: 9px; }
-  #print-area h2 { font-size: 12px; margin: 0; }
-  #print-area p { margin: 0; line-height: 1.1; font-size: 9px; }
-  .report-grid { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 2mm !important; }
-  .day-card { break-inside: avoid; page-break-inside: avoid; border: 0.4pt solid #a31621 !important; }
-  .day-card > div:first-child { font-size: 8pt !important; padding: 1pt 0 !important; }
-  .day-card table { width: 100%; border-collapse: collapse; }
-  .day-card th, .day-card td { padding: 0.5pt 2pt !important; font-size: 7.5pt !important; line-height: 1.05 !important; }
+
+  /* Área de impressão */
+  #print-area {
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    font-size: 9px;
+    background: white !important;
+    color: black !important;
+  }
+  #print-area h2 { font-size: 12px; margin: 0; color: #000 !important; }
+  #print-area p  { margin: 0; line-height: 1.1; font-size: 9px; color: #000 !important; }
+  #print-area span, #print-area td, #print-area th, #print-area div {
+    color: #000 !important;
+    background: white !important;
+  }
+
+  /* Grid e cards de dias */
+  .report-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 2mm !important;
+  }
+  .day-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 0.4pt solid #a31621 !important;
+    background: white !important;
+  }
+  .day-card > div:first-child {
+    font-size: 8pt !important;
+    padding: 1pt 0 !important;
+    background: #f0f0f0 !important;
+    color: #000 !important;
+  }
+  .day-card table { width: 100%; border-collapse: collapse; background: white !important; }
+  .day-card th {
+    background: #e8e8e8 !important;
+    color: #000 !important;
+    padding: 0.5pt 2pt !important;
+    font-size: 7.5pt !important;
+    line-height: 1.05 !important;
+  }
+  .day-card td {
+    color: #000 !important;
+    background: white !important;
+    padding: 0.5pt 2pt !important;
+    font-size: 7.5pt !important;
+    line-height: 1.05 !important;
+  }
+
+  /* Remover sombras e bordas coloridas */
+  .shadow-lg, .shadow, .shadow-card { box-shadow: none !important; }
+  [class*="border-fire"] { border-color: #ccc !important; }
 }
 
 /* Garantia de contraste em inputs, selects e textareas */
