@@ -1,0 +1,272 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   TEMA ESCURO CINEMATOGRÁFICO — Voluntários PE Seguro / 3º GB
+   Paleta: preto #0A0A0A · grafite #1A1A1A · vermelho #C1121F
+           laranja #FF6A00 · âmbar #FFC300
+   Todas as cores em HSL.
+   ============================================================ */
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;            /* #0A0A0A */
+    --foreground: 0 0% 96%;
+
+    --card: 0 0% 10%;                 /* #1A1A1A */
+    --card-foreground: 0 0% 96%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 96%;
+
+    --primary: 356 83% 41%;           /* #C1121F */
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 92%;
+
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 64%;
+
+    --accent: 46 100% 50%;            /* #FFC300 */
+    --accent-foreground: 0 0% 8%;
+
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 17%;
+    --input: 0 0% 16%;
+    --ring: 25 100% 50%;              /* #FF6A00 */
+
+    /* Tokens temáticos (mesmos nomes, agora em modo escuro) */
+    --fire-red: 356 83% 41%;          /* #C1121F */
+    --fire-red-dark: 356 88% 30%;
+    --fire-orange: 25 100% 50%;       /* #FF6A00 */
+    --fire-gold: 46 100% 50%;         /* #FFC300 */
+    --fire-black: 0 0% 96%;           /* usado como cor de TEXTO nas páginas */
+    --fire-gray: 0 0% 12%;            /* superfícies escuras */
+    --fire-light: 0 0% 7%;            /* superfícies escuras (gradientes de fundo) */
+
+    --gradient-fire: linear-gradient(135deg, hsl(var(--fire-red)), hsl(var(--fire-orange)));
+    --gradient-gold: linear-gradient(135deg, hsl(var(--fire-orange)), hsl(var(--fire-gold)));
+    --gradient-ember: linear-gradient(100deg, hsl(var(--fire-red)) 0%, hsl(var(--fire-orange)) 55%, hsl(var(--fire-gold)) 100%);
+    --shadow-fire: 0 10px 30px -10px hsl(var(--fire-red) / 0.45);
+    --shadow-gold: 0 8px 25px -8px hsl(var(--fire-gold) / 0.35);
+    --shadow-depth: 0 1px 2px hsl(0 0% 0% / 0.5), 0 8px 24px -8px hsl(0 0% 0% / 0.6);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 356 83% 41%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 92%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 25 100% 50%;
+  }
+
+  /* Modo escuro é o padrão — .dark espelha os mesmos valores */
+  .dark {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 356 83% 41%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 92%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 64%;
+    --accent: 46 100% 50%;
+    --accent-foreground: 0 0% 8%;
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 17%;
+    --input: 0 0% 16%;
+    --ring: 25 100% 50%;
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 356 83% 41%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 92%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 25 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
+  }
+
+  /* Scrollbar escura discreta */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: hsl(0 0% 6%); }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(0 0% 20%);
+    border-radius: 6px;
+    border: 2px solid hsl(0 0% 6%);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--fire-red)); }
+}
+
+@layer components {
+  /* Card em glassmorphism refinado */
+  .glass-card {
+    background: hsl(0 0% 10% / 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsl(0 0% 100% / 0.08);
+    box-shadow: var(--shadow-depth);
+    transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  }
+  .glass-card:hover {
+    border-color: hsl(var(--fire-gold) / 0.35);
+    box-shadow: var(--shadow-depth), inset 0 0 24px hsl(var(--fire-gold) / 0.05);
+  }
+
+  /* Título com gradiente brasa (vermelho → laranja → âmbar) */
+  .text-gradient-fire {
+    background: var(--gradient-ember);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Destaque lateral âmbar (item atual/ativo) */
+  .ember-edge {
+    border-left: 3px solid hsl(var(--fire-gold));
+  }
+
+  /* Skeleton shimmer no tema escuro */
+  .shimmer {
+    background: linear-gradient(90deg, hsl(0 0% 12%) 25%, hsl(0 0% 18%) 50%, hsl(0 0% 12%) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Micro-interação padrão para cards clicáveis */
+  .card-interactive {
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  }
+  .card-interactive:hover {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-fire);
+  }
+}
+
+/* Impressão permanece em fundo branco (relatórios) */
+@media print {
+  @page { size: A4 portrait; margin: 6mm; }
+
+  /* Fundo branco e letra preta em tudo */
+  html, body, * {
+    background: white !important;
+    background-color: white !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print\:hidden { display: none !important; }
+
+  /* Área de impressão */
+  #print-area {
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    font-size: 9px;
+    background: white !important;
+    color: black !important;
+  }
+  #print-area h2 { font-size: 12px; margin: 0; color: #000 !important; }
+  #print-area p  { margin: 0; line-height: 1.1; font-size: 9px; color: #000 !important; }
+  #print-area span, #print-area td, #print-area th, #print-area div {
+    color: #000 !important;
+    background: white !important;
+  }
+
+  /* Grid e cards de dias */
+  .report-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 2mm !important;
+  }
+  .day-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 0.4pt solid #a31621 !important;
+    background: white !important;
+  }
+  .day-card > div:first-child {
+    font-size: 8pt !important;
+    padding: 1pt 0 !important;
+    background: #f0f0f0 !important;
+    color: #000 !important;
+  }
+  .day-card table { width: 100%; border-collapse: collapse; background: white !important; }
+  .day-card th {
+    background: #e8e8e8 !important;
+    color: #000 !important;
+    padding: 0.5pt 2pt !important;
+    font-size: 7.5pt !important;
+    line-height: 1.05 !important;
+  }
+  .day-card td {
+    color: #000 !important;
+    background: white !important;
+    padding: 0.5pt 2pt !important;
+    font-size: 7.5pt !important;
+    line-height: 1.05 !important;
+  }
+
+  /* Remover sombras e bordas coloridas */
+  .shadow-lg, .shadow, .shadow-card { box-shadow: none !important; }
+  [class*="border-fire"] { border-color: #ccc !important; }
+}
+
+/* Garantia de contraste em inputs, selects e textareas */
+@layer base {
+  input, select, textarea {
+    color: hsl(var(--foreground)) !important;
+    background-color: hsl(var(--input)) !important;
+  }
+  input::placeholder, textarea::placeholder {
+    color: hsl(var(--muted-foreground)) !important;
+    opacity: 0.7;
+  }
+  /* Badge e pill de status */
+  .badge-status {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  /* Tabela: linhas zebradas legíveis */
+  tbody tr:nth-child(even) {
+    background-color: hsl(0 0% 13%);
+  }
+  tbody tr:hover {
+    background-color: hsl(var(--fire-red) / 0.12);
+  }
+  td, th {
+    color: hsl(var(--foreground));
+  }
+}
