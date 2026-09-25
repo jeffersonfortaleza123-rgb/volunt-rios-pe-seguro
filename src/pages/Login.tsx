@@ -150,7 +150,10 @@ const Login = () => {
             <Badge variant="outline" className="text-lg px-6 py-3 bg-fire-red text-primary-foreground border-fire-red shadow-fire mb-4">
               🔥 Bombeiros Militar
             </Badge>
-            <h1 className="text-3xl font-extrabold text-gradient-fire mb-2">Sistema de Escalas</h1>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gradient-fire mb-2 leading-tight">
+              Voluntários para PE SEGURO / Op. BIOMA
+            </h1>
+            <h2 className="text-lg font-semibold text-fire-black mb-1">Sistema de Escalas</h2>
             <p className="text-muted-foreground">Corpo de Bombeiros - Voluntariado</p>
           </div>
 
